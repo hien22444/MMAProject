@@ -15,7 +15,7 @@ import OrderDetailScreen from '../screens/OrderDetailScreen';
 import ReviewScreen from '../screens/ReviewScreen';
 import PaymentScreen from '../screens/PaymentScreen';
 import CouponScreen from '../screens/CouponScreen';
-import HelpCenterScreen from '../screens/screens/HelpCenterScreen';
+import HelpCenterScreen from '../screens/HelpCenterScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
