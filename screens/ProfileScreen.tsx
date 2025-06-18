@@ -30,6 +30,8 @@ const handlePress = (label: string) => {
         navigation.navigate('ShippingAddress')}
         else if (label === 'Cài đặt tài khoản') {
           navigation.navigate('AccountSettings')}
+          else if (label === 'Trung tâm trợ giúp') {
+            navigation.navigate('HelpCenter')}
       else {
       Alert.alert('Tính năng', `Bạn đã chọn: ${label}`);
     }
