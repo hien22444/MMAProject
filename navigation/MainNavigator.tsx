@@ -16,53 +16,59 @@ import ReviewScreen from '../screens/ReviewScreen';
 import PaymentScreen from '../screens/PaymentScreen';
 import CouponScreen from '../screens/CouponScreen';
 import HelpCenterScreen from '../screens/HelpCenterScreen';
+import BottomTabNavigator from './BottomTabNavigator';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function MainNavigator() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Profile">
+      {/* <Stack.Navigator initialRouteName="Tabs"> */}
+      <Stack.Navigator initialRouteName="Tabs" screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Tabs" component={BottomTabNavigator} />
+
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="Wishlist" component={WishlistScreen} />
         <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
-        <Stack.Screen name="ShippingAddress" component={ShippingAddressScreen}/>
-        <Stack.Screen name="AccountSettings" component={AccountSettingsScreen}/>
-        <Stack.Screen name="HelpCenter" component={HelpCenterScreen}/>
-       
-      <Stack.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{ title: "Trang chủ" }}
-      />
-      <Stack.Screen
-        name="Support"
-        component={SupportScreen}
-        options={{ title: "Hỗ trợ" }}
-      />
-      <Stack.Screen
-        name="OrderDetail"
-        component={OrderDetailScreen}
-        options={{ title: "Chi tiết đơn hàng" }}
-      />
-      <Stack.Screen
-        name="Review"
-        component={ReviewScreen}
-        options={{ title: "Đánh giá" }}
-      />
-      <Stack.Screen
-        name="Payment"
-        component={PaymentScreen}
-        options={{ title: "Thanh toán" }}
-      />
-      <Stack.Screen
-        name="Coupon"
-        component={CouponScreen}
-        options={{ title: "Mã giảm giá" }}
-      />
-  
+        <Stack.Screen name="ShippingAddress" component={ShippingAddressScreen} />
+        <Stack.Screen name="AccountSettings" component={AccountSettingsScreen} />
+        <Stack.Screen name="HelpCenter" component={HelpCenterScreen} />
+
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ title: "Trang chủ" }}
+        />
+        <Stack.Screen
+          name="Support"
+          component={SupportScreen}
+          options={{ title: "Hỗ trợ" }}
+        />
+        <Stack.Screen
+          name="OrderDetail"
+          component={OrderDetailScreen}
+          options={{ title: "Chi tiết đơn hàng" }}
+        />
+        <Stack.Screen
+          name="Review"
+          component={ReviewScreen}
+          options={{ title: "Đánh giá" }}
+        />
+        <Stack.Screen
+          name="Payment"
+          component={PaymentScreen}
+          options={{ title: "Thanh toán" }}
+        />
+        <Stack.Screen
+          name="Coupon"
+          component={CouponScreen}
+          options={{ title: "Mã giảm giá" }}
+        />
+
 
       </Stack.Navigator>
+
+
     </NavigationContainer>
   );
 }

@@ -9,34 +9,28 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/navigation';
 
- import { NativeStackScreenProps } from '@react-navigation/native-stack';
+export default function ProfileScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-import { RootStackParamList } from '../types/navigation'; 
-
-type Props = NativeStackScreenProps<RootStackParamList, 'Profile'>;
-
-export default function ProfileScreen({ navigation }: Props) {
-  
-
-
-const handlePress = (label: string) => {
+  const handlePress = (label: string) => {
     if (label === 'Danh sách yêu thích') {
       navigation.navigate('Wishlist');
-    } 
-    else if (label === 'Đơn hàng của tôi') {
-      navigation.navigate('OrderHistory')}
-      else if (label === 'Địa chỉ giao hàng') {
-        navigation.navigate('ShippingAddress')}
-        else if (label === 'Cài đặt tài khoản') {
-          navigation.navigate('AccountSettings')}
-          else if (label === 'Trung tâm trợ giúp') {
-            navigation.navigate('HelpCenter')}
-      else {
+    } else if (label === 'Đơn hàng của tôi') {
+      navigation.navigate('OrderHistory');
+    } else if (label === 'Địa chỉ giao hàng') {
+      navigation.navigate('ShippingAddress');
+    } else if (label === 'Cài đặt tài khoản') {
+      navigation.navigate('AccountSettings');
+    } else if (label === 'Trung tâm trợ giúp') {
+      navigation.navigate('HelpCenter');
+    } else {
       Alert.alert('Tính năng', `Bạn đã chọn: ${label}`);
     }
   };
-  
 
   return (
     <ScrollView style={styles.container}>
@@ -90,10 +84,7 @@ const handlePress = (label: string) => {
 
   function renderItem(label: string, iconName: any) {
     return (
-      <TouchableOpacity
-        style={styles.item}
-        onPress={() => handlePress(label)}
-      >
+      <TouchableOpacity style={styles.item} onPress={() => handlePress(label)}>
         <Ionicons name={iconName} size={22} color="#444" style={styles.itemIcon} />
         <Text style={styles.itemLabel}>{label}</Text>
       </TouchableOpacity>

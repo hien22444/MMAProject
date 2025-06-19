@@ -19,6 +19,8 @@ export type RootStackParamList = {
       
     Coupon:undefined;
     HelpCenter: undefined;
+    Tabs: undefined;
+    Notification: undefined;
 
        
 
