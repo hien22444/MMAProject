@@ -19,6 +19,17 @@ import CartScreen from '../screens/CartScreen';
 import Homepage from '../screens/Homepage';
 import {BottomTabParamList} from '../types/navigation';
 import LoginScreen from '../screens/LoginScreen';
+
+// Thêm import các màn hình quản lý
+import ProductManagementScreen from '../screens/ProductManagementScreen';
+import OrderManagementScreen from '../screens/OrderManagementScreen';
+import CategoryManagementScreen from '../screens/CategoryManagementScreen';
+import AnalyticsScreen from '../screens/AnalyticsScreen';
+import AddressScreen from '../screens/AddressScreen';
+import NotificationScreen from '../screens/NotificationScreen';
+import DashboardScreen from '../screens/DashboardScreen';
+import SearchScreen from '../screens/SearchScreen';
+
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function MainNavigator() {
@@ -39,6 +50,16 @@ export default function MainNavigator() {
         <Stack.Screen name="ProductDetail" component={ProductDetail} />
         <Stack.Screen name="Checkout" component={Checkout} />
         <Stack.Screen name="Login" component={LoginScreen} />
+        
+        {/* Thêm các màn hình quản lý */}
+        <Stack.Screen name="Dashboard" component={DashboardScreen} options={{ title: 'Bảng điều khiển' }} />
+        <Stack.Screen name="ProductManagement" component={ProductManagementScreen} options={{ title: 'Quản lý sản phẩm' }} />
+        <Stack.Screen name="OrderManagement" component={OrderManagementScreen} options={{ title: 'Quản lý đơn hàng' }} />
+        <Stack.Screen name="CategoryManagement" component={CategoryManagementScreen} options={{ title: 'Quản lý danh mục' }} />
+        <Stack.Screen name="Analytics" component={AnalyticsScreen} options={{ title: 'Thống kê' }} />
+        <Stack.Screen name="Address" component={AddressScreen} options={{ title: 'Địa chỉ' }} />
+        <Stack.Screen name="Notification" component={NotificationScreen} options={{ title: 'Thông báo' }} />
+        <Stack.Screen name="Search" component={SearchScreen} options={{ title: 'Tìm kiếm' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

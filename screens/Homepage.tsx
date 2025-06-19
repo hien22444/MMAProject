@@ -16,6 +16,7 @@ type RootStackParamList = {
   ProductDetail: { product: Product };
   Cart: undefined;
   Profile: undefined;
+  Dashboard: undefined;
 };
 
 const products: Product[] = [
@@ -77,20 +78,22 @@ const Homepage: React.FC = () => {
   const numColumns = 2;
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
+    <View style={styles.container}>      {/* Header */}
       <View style={styles.headerContainer}>
-  <Image source={require('../assets/logo.png')} style={styles.logo} />
-  <TextInput
-    style={styles.searchInput}
-    placeholder="🔍 Tìm kiếm sản phẩm..."
-    value={searchQuery}
-    onChangeText={setSearchQuery}
-  />
-  {/* <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-    <Image source={require('../assets/logo.png')} style={styles.profileIcon} />
-  </TouchableOpacity> */}
-</View>
+        <Image source={require('../assets/logo.png')} style={styles.logo} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="🔍 Tìm kiếm sản phẩm..."
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        <TouchableOpacity 
+          style={styles.dashboardButton} 
+          onPress={() => navigation.navigate('Dashboard')}
+        >
+          <Text style={styles.dashboardButtonText}>🔧</Text>
+        </TouchableOpacity>
+      </View>
 
 
       {/* Banner */}
@@ -190,6 +193,18 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 10,
     backgroundColor: '#f0f0f0',
+  },
+  dashboardButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 8,
+  },
+  dashboardButtonText: {
+    fontSize: 20,
   },
 
   bannerContainer: {

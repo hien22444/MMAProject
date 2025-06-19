@@ -25,14 +25,21 @@ const handlePress = (label: string) => {
       navigation.navigate('Wishlist');
     } 
     else if (label === 'Đơn hàng của tôi') {
-      navigation.navigate('OrderHistory')}
-      else if (label === 'Địa chỉ giao hàng') {
-        navigation.navigate('ShippingAddress')}
-        else if (label === 'Cài đặt tài khoản') {
-          navigation.navigate('AccountSettings')}
-          else if (label === 'Trung tâm trợ giúp') {
-            navigation.navigate('HelpCenter')}
-      else {
+      navigation.navigate('OrderHistory');
+    }
+    else if (label === 'Địa chỉ giao hàng') {
+      navigation.navigate('ShippingAddress');
+    }
+    else if (label === 'Cài đặt tài khoản') {
+      navigation.navigate('AccountSettings');
+    }
+    else if (label === 'Trung tâm trợ giúp') {
+      navigation.navigate('HelpCenter');
+    }
+    else if (label === 'Bảng điều khiển') {
+      navigation.navigate('Dashboard');
+    }
+    else {
       Alert.alert('Tính năng', `Bạn đã chọn: ${label}`);
     }
   };
@@ -76,14 +83,17 @@ const handlePress = (label: string) => {
         {renderItem('Đơn hàng của tôi', 'cube-outline')}
         {renderItem('Danh sách yêu thích', 'heart-outline')}
         {renderItem('Địa chỉ giao hàng', 'location-outline')}
-      </View>
-
-      <View style={styles.section}>
+      </View>      <View style={styles.section}>
         <Text style={styles.sectionTitle}>Hỗ trợ & Cài đặt</Text>
         {renderItem('Cài đặt tài khoản', 'settings-outline')}
         {renderItem('Trung tâm trợ giúp', 'help-circle-outline')}
         {renderItem('Chính sách & Điều khoản', 'document-text-outline')}
         {renderItem('Đăng xuất', 'log-out-outline')}
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Quản lý</Text>
+        {renderItem('Bảng điều khiển', 'grid-outline')}
       </View>
     </ScrollView>
   );
