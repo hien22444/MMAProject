@@ -1,32 +1,35 @@
-// /navigation/MainNavigator.tsx
-
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import ProfileScreen from '../screens/ProfileScreen';
+import { RootStackParamList } from '../types/navigation';
+import TabNavigator from './TabNavigator'; // import TabNavigator
 import WishlistScreen from '../screens/WishlistScreen';
 import OrderHistoryScreen from '../screens/OrderHistoryScreen';
 import ShippingAddressScreen from '../screens/ShippingAddressScreen';
-import { RootStackParamList } from '../types/navigation'; //  Import từ file types
 import AccountSettingsScreen from '../screens/AccountSettingsScreen';
-import HomeScreen from '../screens/HomeScreen';
+import HelpCenterScreen from '../screens/HelpCenterScreen';
 import SupportScreen from '../screens/SupportScreen';
 import OrderDetailScreen from '../screens/OrderDetailScreen';
 import ReviewScreen from '../screens/ReviewScreen';
 import PaymentScreen from '../screens/PaymentScreen';
 import CouponScreen from '../screens/CouponScreen';
-import HelpCenterScreen from '../screens/HelpCenterScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+
 import BottomTabNavigator from './BottomTabNavigator';
+
+import ProductDetail from '../screens/ProductDetail';
+import Checkout from '../screens/Checkout';
+import CartScreen from '../screens/CartScreen';
+import Homepage from '../screens/Homepage';
+import { BottomTabParamList } from '../types/navigation';
+import LoginScreen from '../screens/LoginScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function MainNavigator() {
   return (
     <NavigationContainer>
-      {/* <Stack.Navigator initialRouteName="Tabs"> */}
-      <Stack.Navigator initialRouteName="Tabs" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Tabs" component={BottomTabNavigator} />
-
+      <Stack.Navigator initialRouteName="Profile">
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="Wishlist" component={WishlistScreen} />
         <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
@@ -34,11 +37,7 @@ export default function MainNavigator() {
         <Stack.Screen name="AccountSettings" component={AccountSettingsScreen} />
         <Stack.Screen name="HelpCenter" component={HelpCenterScreen} />
 
-        <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{ title: "Trang chủ" }}
-        />
+
         <Stack.Screen
           name="Support"
           component={SupportScreen}
