@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
-
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { MaterialIcons as Icon } from "@expo/vector-icons";
+import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
+import type { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from '../types/navigation';
+import { useCart } from '../contexts/CartContext';
+
+type PaymentScreenRouteProp = RouteProp<RootStackParamList, 'Payment'>;
+type PaymentScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 type MaterialIconName =
   | "local-shipping"
@@ -27,25 +27,14 @@ const savedCards = [
   { id: "2", last4: "5555", type: "mastercard", isDefault: false },
 ];
 
-import type { StackNavigationProp } from "@react-navigation/stack";
-
-type RootStackParamList = {
-  AddCard: undefined;
-  OrderConfirmation: undefined;
-  // add other screens if needed
-};
-
-type PaymentScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "AddCard"
->;
-
-interface PaymentScreenProps {
-  navigation: PaymentScreenNavigationProp;
-}
-
-const PaymentScreen = ({ navigation }: PaymentScreenProps) => {
+const PaymentScreen = () => {
+  const route = useRoute<PaymentScreenRouteProp>();
+  const navigation = useNavigation<PaymentScreenNavigationProp>();
+  const totalAmount = route.params.totalAmount; // Nhận từ CartScreen
   const [selectedMethod, setSelectedMethod] = useState("cod");
+  const { clearCart } = useCart();
+  const shippingFee = 30000;
+  const finalTotal = totalAmount + shippingFee;
 
   return (
     <ScrollView style={styles.container}>
@@ -99,7 +88,7 @@ const PaymentScreen = ({ navigation }: PaymentScreenProps) => {
           ))}
           <TouchableOpacity
             style={styles.addCardButton}
-            onPress={() => navigation.navigate("AddCard")}
+            // onPress={() => navigation.navigate("AddCard")}
           >
             <Icon name="add" size={24} color="#6200ee" />
             <Text style={styles.addCardText}>Thêm thẻ mới</Text>
@@ -110,28 +99,27 @@ const PaymentScreen = ({ navigation }: PaymentScreenProps) => {
       <View style={styles.summary}>
         <View style={styles.summaryRow}>
           <Text>Tạm tính:</Text>
-          <Text>1,250,000đ</Text>
+          <Text>{totalAmount.toLocaleString()}đ</Text>
         </View>
         <View style={styles.summaryRow}>
           <Text>Phí vận chuyển:</Text>
-          <Text>30,000đ</Text>
-        </View>
-        <View style={styles.summaryRow}>
-          <Text>Giảm giá:</Text>
-          <Text style={styles.discountText}>-50,000đ</Text>
+          <Text>{shippingFee.toLocaleString()}đ</Text>
         </View>
         <View style={[styles.summaryRow, styles.totalRow]}>
           <Text style={styles.totalText}>Tổng cộng:</Text>
-          <Text style={styles.totalText}>1,230,000đ</Text>
+          <Text style={styles.totalText}>{finalTotal.toLocaleString()}đ</Text>
         </View>
       </View>
 
       <TouchableOpacity
-        style={styles.paymentButton}
-        onPress={() => navigation.navigate("OrderConfirmation")}
-      >
-        <Text style={styles.paymentButtonText}>Hoàn tất thanh toán</Text>
-      </TouchableOpacity>
+  style={styles.paymentButton}
+  onPress={() => {
+    clearCart();
+    navigation.navigate('Tab', { screen: 'Home' }); 
+  }}
+>
+  <Text style={styles.paymentButtonText}>Hoàn tất thanh toán</Text>
+</TouchableOpacity>
     </ScrollView>
   );
 };
@@ -249,9 +237,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 8,
-  },
-  discountText: {
-    color: "#4CAF50",
   },
   totalRow: {
     borderTopWidth: 1,
