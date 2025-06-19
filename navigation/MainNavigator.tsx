@@ -14,29 +14,24 @@ import ReviewScreen from '../screens/ReviewScreen';
 import PaymentScreen from '../screens/PaymentScreen';
 import CouponScreen from '../screens/CouponScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-
-import BottomTabNavigator from './BottomTabNavigator';
-
 import ProductDetail from '../screens/ProductDetail';
-import Checkout from '../screens/Checkout';
-import CartScreen from '../screens/CartScreen';
-import Homepage from '../screens/Homepage';
-import { BottomTabParamList } from '../types/navigation';
-import LoginScreen from '../screens/LoginScreen';
+
+
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function MainNavigator() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Profile">
+      <Stack.Navigator initialRouteName="Tab">
+        <Stack.Screen name="Tab" component={TabNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="Wishlist" component={WishlistScreen} />
         <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
         <Stack.Screen name="ShippingAddress" component={ShippingAddressScreen} />
         <Stack.Screen name="AccountSettings" component={AccountSettingsScreen} />
         <Stack.Screen name="HelpCenter" component={HelpCenterScreen} />
-
+        <Stack.Screen name="ProductDetail" component={ProductDetail} />
 
         <Stack.Screen
           name="Support"
