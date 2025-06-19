@@ -18,10 +18,19 @@ export type RootStackParamList = {
     Coupon:undefined;
     HelpCenter: undefined;
     Tabs: undefined;
-    Notification: undefined;
+    
     ProductDetail:undefined;
     Checkout:undefined;
     Login:undefined;
+    
+    ProductList: undefined;
+    Search: undefined;
+    Address: undefined;
+    Notification: undefined;
+    ProductManagement: undefined;
+    OrderManagement: undefined;
+    CategoryManagement: undefined;
+    Analytics: undefined;
        
 
 

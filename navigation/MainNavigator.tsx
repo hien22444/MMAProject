@@ -15,6 +15,12 @@ import PaymentScreen from '../screens/PaymentScreen';
 import CouponScreen from '../screens/CouponScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ProductDetail from '../screens/ProductDetail';
+import AddressScreen from '../screens/AddressScreen';
+import NotificationScreen from '../screens/NotificationScreen';
+import ProductManagementScreen from '../screens/ProductManagementScreen';
+import OrderManagementScreen from '../screens/OrderManagementScreen';
+import CategoryManagementScreen from '../screens/CategoryManagementScreen';
+import AnalyticsScreen from '../screens/AnalyticsScreen';
 
 
 
@@ -32,6 +38,12 @@ export default function MainNavigator() {
         <Stack.Screen name="AccountSettings" component={AccountSettingsScreen} />
         <Stack.Screen name="HelpCenter" component={HelpCenterScreen} />
         <Stack.Screen name="ProductDetail" component={ProductDetail} />
+        <Stack.Screen name="Address" component={AddressScreen} options={{ title: 'Địa chỉ giao hàng' }} />
+        <Stack.Screen name="Notification" component={NotificationScreen} options={{ title: 'Thông báo' }} />
+        <Stack.Screen name="ProductManagement" component={ProductManagementScreen} options={{ title: 'Quản lý sản phẩm' }} />
+        <Stack.Screen name="OrderManagement" component={OrderManagementScreen} options={{ title: 'Quản lý đơn hàng' }} />
+        <Stack.Screen name="CategoryManagement" component={CategoryManagementScreen} options={{ title: 'Quản lý danh mục' }} />
+        <Stack.Screen name="Analytics" component={AnalyticsScreen} options={{ title: 'Thống kê' }} />
 
         <Stack.Screen
           name="Support"
