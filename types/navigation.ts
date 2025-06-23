@@ -22,6 +22,7 @@ export type RootStackParamList = {
     ProductDetail:undefined;
     Checkout:undefined;
     Login:undefined;
+    Register:undefined;
     
     ProductList: undefined;
     Search: undefined;
@@ -31,6 +32,9 @@ export type RootStackParamList = {
     OrderManagement: undefined;
     CategoryManagement: undefined;
     Analytics: undefined;
+    Policy: undefined;
+    AccountSecurity:undefined;
+    MyProfile:undefined;
        
 
 

@@ -17,9 +17,9 @@ export default function ProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const handlePress = (label: string) => {
-    if (label === 'Danh sách yêu thích') {
-      navigation.navigate('Wishlist');
-    } else if (label === 'Đơn hàng của tôi') {
+    // if (label === 'Danh sách yêu thích') {
+    //   navigation.navigate('Wishlist');
+    if (label === 'Đơn hàng của tôi') {
       navigation.navigate('OrderHistory');
     } else if (label === 'Địa chỉ giao hàng') {
       navigation.navigate('ShippingAddress');
@@ -27,6 +27,10 @@ export default function ProfileScreen() {
       navigation.navigate('AccountSettings');
     } else if (label === 'Trung tâm trợ giúp') {
       navigation.navigate('HelpCenter');
+    } else if (label === 'Chính sách & Điều khoản') {
+      navigation.navigate('Policy');
+    } else if (label === 'Chỉnh sửa hồ sơ') {
+      navigation.navigate('MyProfile');
     } else {
       Alert.alert('Tính năng', `Bạn đã chọn: ${label}`);
     }
@@ -52,15 +56,16 @@ export default function ProfileScreen() {
             onPress={() => handlePress('Chỉnh sửa hồ sơ')}
           >
             <Ionicons name="create-outline" size={20} color="#fff" />
+            {/* {renderItem('Chỉnh sửa hồ sơ', 'create-outline')} */}
             <Text style={styles.actionText}>Chỉnh sửa</Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.actionButton}
             onPress={() => handlePress('Đổi mật khẩu')}
           >
             <Ionicons name="lock-closed-outline" size={20} color="#fff" />
             <Text style={styles.actionText}>Đổi mật khẩu</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
 
@@ -68,7 +73,7 @@ export default function ProfileScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Tài khoản</Text>
         {renderItem('Đơn hàng của tôi', 'cube-outline')}
-        {renderItem('Danh sách yêu thích', 'heart-outline')}
+        {/* {renderItem('Danh sách yêu thích', 'heart-outline')} */}
         {renderItem('Địa chỉ giao hàng', 'location-outline')}
       </View>
 

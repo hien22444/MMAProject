@@ -22,6 +22,12 @@ import OrderManagementScreen from '../screens/OrderManagementScreen';
 import CategoryManagementScreen from '../screens/CategoryManagementScreen';
 import AnalyticsScreen from '../screens/AnalyticsScreen';
 
+import LoginScreen from '../screens/LoginScreen';
+import RegisterScreen from '../screens/RegisterScreen';
+import PolicyScreen from '../screens/PolicyScreen';
+import AccountSecurityScreen from '../screens/AccountSecurityScreen';
+import MyProfileScreen from '../screens/MyProfileScreen';
+
 
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -44,6 +50,11 @@ export default function MainNavigator() {
         <Stack.Screen name="OrderManagement" component={OrderManagementScreen} options={{ title: 'Quản lý đơn hàng' }} />
         <Stack.Screen name="CategoryManagement" component={CategoryManagementScreen} options={{ title: 'Quản lý danh mục' }} />
         <Stack.Screen name="Analytics" component={AnalyticsScreen} options={{ title: 'Thống kê' }} />
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
+        <Stack.Screen name="Policy" component={PolicyScreen} />
+        <Stack.Screen name="AccountSecurity" component={AccountSecurityScreen} options={{ title: 'Tài khoản & Bảo mật' }} />
+        <Stack.Screen name="MyProfile" component={MyProfileScreen} options={{ title: 'Hồ sơ của tôi' }} />
 
         <Stack.Screen
           name="Support"
