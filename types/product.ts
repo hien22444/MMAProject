@@ -12,5 +12,6 @@ export interface Product {
   name: string;
   price: string;
   image: ImageSourcePropType;
-  variants?: ProductVariant[];
+  describe:string;
+  sold:string;
 }

@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
-import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
-import { Product, ProductVariant } from '../types/product';
+import { Product } from '../types/product';
 import { useCart } from '../contexts/CartContext';
 
 type ProductDetailRouteProp = RouteProp<{ ProductDetail: { product: Product } }, 'ProductDetail'>;
@@ -11,66 +11,77 @@ const ProductDetail: React.FC = () => {
   const { product } = params;
   const { addToCart } = useCart();
 
-  const renderVariant = ({ item }: { item: ProductVariant }) => (
-    <View style={styles.card}>
-      <Image source={item.image} style={styles.image} />
-      <Text style={styles.productName}>{item.name}</Text>
-      <Text style={styles.productPrice}>{item.price}</Text>
-      <TouchableOpacity 
-        style={styles.button} 
-        onPress={() => addToCart(item)}
-      >
-        <Text style={styles.buttonText}>Thêm vào giỏ</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>{product.name}</Text>
-      {product.variants ? (
-        <FlatList
-          data={product.variants}
-          keyExtractor={(item) => item.id}
-          renderItem={renderVariant}
-          contentContainerStyle={{ paddingBottom: 20 }}
-        />
-      ) : (
-        <Text style={styles.noVariantText}>Không có sản phẩm này.</Text>
-      )}
-    </View>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Image source={product.image} style={styles.image} />
+
+      <Text style={styles.name}>{product.name}</Text>
+      <Text style={styles.price}>{product.price}</Text>
+
+      {/* Mô tả chi tiết */}
+      <Text style={styles.describe}>{product.describe}</Text>
+
+      {/* Đã bán */}
+      <Text style={styles.sold}>Đã bán: {product.sold}</Text>
+
+      {/* Nút thêm vào giỏ */}
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => addToCart(product)}
+      >
+        <Text style={styles.buttonText}>Thêm vào giỏ hàng</Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 10, backgroundColor: '#f9f9f9' },
-  header: { fontSize: 26, textAlign: 'center', marginVertical: 15, fontWeight: 'bold', color: '#333' },
-  noVariantText: { textAlign: 'center', marginTop: 20, color: '#888', fontSize: 16 },
-
-  card: {
-    backgroundColor: '#fff',
+  container: {
     padding: 15,
-    borderRadius: 10,
-    marginVertical: 10,
+    backgroundColor: '#fff',
     alignItems: 'center',
-    elevation: 3, // Android shadow
-    shadowColor: '#000', // iOS shadow
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
   },
-  image: { width: 150, height: 150, borderRadius: 10, marginBottom: 10 },
-  productName: { fontSize: 18, fontWeight: 'bold', color: '#333' },
-  productPrice: { fontSize: 16, color: '#888', marginVertical: 5 },
-  
+  image: {
+    width: '100%',
+    height: 250,
+    borderRadius: 10,
+    marginBottom: 15,
+  },
+  name: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  price: {
+    fontSize: 20,
+    color: 'red',
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  describe: {
+    fontSize: 16,
+    color: '#555',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  sold: {
+    fontSize: 14,
+    color: '#888',
+    marginBottom: 20,
+  },
   button: {
     backgroundColor: '#ff6f61',
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    marginTop: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    borderRadius: 25,
   },
-  buttonText: { color: '#fff', fontWeight: 'bold' },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
 });
 
 export default ProductDetail;
