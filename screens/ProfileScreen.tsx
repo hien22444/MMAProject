@@ -10,11 +10,18 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { CommonActions } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function ProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { currentUser, logout } = useAuth();
+  const handleLogout = () => {
+    // Chỉ gọi logout() - RootNavigator sẽ tự động xử lý việc điều hướng
+    logout();
+  };
 
   const handlePress = (label: string) => {
     // if (label === 'Danh sách yêu thích') {
@@ -31,6 +38,8 @@ export default function ProfileScreen() {
       navigation.navigate('Policy');
     } else if (label === 'Chỉnh sửa hồ sơ') {
       navigation.navigate('MyProfile');
+    } else if (label === 'Đăng xuất') {
+      handleLogout();
     } else {
       Alert.alert('Tính năng', `Bạn đã chọn: ${label}`);
     }
@@ -38,17 +47,23 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      {/* Thông tin người dùng */}
-      <View style={styles.profileHeader}>
+      {/* Thông tin người dùng */}      <View style={styles.profileHeader}>
         <Image
           source={{
             uri: 'https://img.freepik.com/premium-vector/male-face-avatar-icon-set-flat-design-social-media-profiles_1281173-3806.jpg?semt=ais_hybrid&w=740',
           }}
           style={styles.avatar}
         />
-        <Text style={styles.name}>Nguyễn Văn A</Text>
-        <Text style={styles.info}>nguyenvana@gmail.com</Text>
+        <Text style={styles.name}>
+          {currentUser?.role === 'admin' ? 'Administrator' : 'Nguyễn Văn A'}
+        </Text>
+        <Text style={styles.info}>{currentUser?.email}</Text>
         <Text style={styles.info}>0909 123 456</Text>
+        {currentUser?.role === 'admin' && (
+          <View style={styles.adminBadge}>
+            <Text style={styles.adminBadgeText}>Admin</Text>
+          </View>
+        )}
 
         <View style={styles.actionRow}>
           <TouchableOpacity
@@ -141,6 +156,18 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginLeft: 6,
     fontSize: 14,
+  },
+  adminBadge: {
+    backgroundColor: '#28a745',
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 15,
+    marginTop: 10,
+  },
+  adminBadgeText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 12,
   },
   section: {
     paddingHorizontal: 20,

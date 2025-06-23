@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -9,46 +9,38 @@ import {
   Alert,
 } from 'react-native';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import { useAuth } from '../contexts/AuthContext';
+import { useOrders, Order as OrderType } from '../contexts/OrderContext';
 
 type OrderStatus =
   | 'Chờ xác nhận'
-  | 'Chờ lấy hàng'
-  | 'Chờ giao hàng'
+  | 'Đang xử lý'
+  | 'Đang giao hàng'
   | 'Đã giao'
-  | 'Trả hàng'
   | 'Đã hủy';
 
-type Order = {
-  id: string;
-  date: string;
-  status: OrderStatus;
-  total: string;
+// Map API statuses to display statuses
+const statusMapping: { [key: string]: OrderStatus } = {
+  'pending': 'Chờ xác nhận',
+  'processing': 'Đang xử lý',
+  'shipping': 'Đang giao hàng',
+  'delivered': 'Đã giao',
+  'cancelled': 'Đã hủy'
 };
 
 const statusFlow: { [key in OrderStatus]?: OrderStatus } = {
-  'Chờ xác nhận': 'Chờ lấy hàng',
-  'Chờ lấy hàng': 'Chờ giao hàng',
+  'Chờ xác nhận': 'Đang xử lý',
+  'Đang xử lý': 'Đang giao hàng',
 };
-
-const initialOrders: Order[] = [
-  { id: 'DH001', date: '2025-06-10', status: 'Đã giao', total: '599.000₫' },
-  { id: 'DH002', date: '2025-06-11', status: 'Chờ xác nhận', total: '259.000₫' },
-  { id: 'DH003', date: '2025-06-12', status: 'Chờ lấy hàng', total: '349.000₫' },
-  { id: 'DH004', date: '2025-06-13', status: 'Chờ giao hàng', total: '499.000₫' },
-  { id: 'DH005', date: '2025-06-14', status: 'Trả hàng', total: '299.000₫' },
-  { id: 'DH006', date: '2025-06-15', status: 'Đã hủy', total: '199.000₫' },
-];
 
 const getStatusColor = (status: OrderStatus) => {
   switch (status) {
     case 'Đã giao':
       return { color: 'green' };
     case 'Chờ xác nhận':
-    case 'Chờ lấy hàng':
-    case 'Chờ giao hàng':
+    case 'Đang xử lý':
+    case 'Đang giao hàng':
       return { color: 'orange' };
-    case 'Trả hàng':
-      return { color: 'blue' };
     case 'Đã hủy':
       return { color: 'red' };
     default:
@@ -56,7 +48,17 @@ const getStatusColor = (status: OrderStatus) => {
   }
 };
 
-const OrderItem = ({ order, onAction }: { order: Order; onAction: (id: string, action: string) => void }) => (
+
+
+// Define display order type for UI
+type DisplayOrder = {
+  id: string;
+  date: string;
+  status: OrderStatus;
+  total: string;
+};
+
+const OrderItem = ({ order, onAction }: { order: DisplayOrder; onAction: (id: string, action: string) => void }) => (
   <View style={styles.card}>
     <View style={styles.row}>
       <Text style={styles.label}>Mã đơn:</Text>
@@ -81,14 +83,9 @@ const OrderItem = ({ order, onAction }: { order: Order; onAction: (id: string, a
         <Text style={styles.action}>❌ Hủy đơn</Text>
       </TouchableOpacity>
     )}
-    {order.status === 'Chờ giao hàng' && (
+    {order.status === 'Đang giao hàng' && (
       <TouchableOpacity onPress={() => onAction(order.id, 'received')}>
         <Text style={styles.action}>✅ Đã nhận đơn hàng</Text>
-      </TouchableOpacity>
-    )}
-    {order.status === 'Đã giao' && (
-      <TouchableOpacity onPress={() => onAction(order.id, 'return')}>
-        <Text style={styles.action}>↩️ Trả hàng</Text>
       </TouchableOpacity>
     )}
   </View>
@@ -98,54 +95,47 @@ export default function OrderHistoryScreen() {
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     { key: 'ChoXacNhan', title: 'Chờ xác nhận' },
-    { key: 'ChoLayHang', title: 'Chờ lấy hàng' },
-    { key: 'ChoGiaoHang', title: 'Chờ giao hàng' },
+    { key: 'DangXuLy', title: 'Đang xử lý' },
+    { key: 'DangGiaoHang', title: 'Đang giao hàng' },
     { key: 'DaGiao', title: 'Đã giao' },
-    { key: 'TraHang', title: 'Trả hàng' },
     { key: 'DaHuy', title: 'Đã hủy' },
   ]);
 
-  const [orders, setOrders] = useState<Order[]>(initialOrders);
+  // Get orders from context
+  const { orders, updateOrderStatus } = useOrders();
+  const { currentUser } = useAuth();
 
-  // Auto transition every 8s
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setOrders((prev) =>
-        prev.map((o) => {
-          if (o.status === 'Chờ xác nhận' || o.status === 'Chờ lấy hàng') {
-            return { ...o, status: statusFlow[o.status] || o.status };
-          }
-          return o;
-        })
-      );
-    }, 8000);
-
-    return () => clearInterval(interval);
-  }, []);
+  // Transform API orders to display format
+  const displayOrders = useMemo<DisplayOrder[]>(() => {
+    if (!currentUser) return [];
+    
+    return orders
+      .filter(order => order.userId === currentUser.email)
+      .map(order => ({
+        id: order.id,
+        date: new Date(order.createdAt).toLocaleDateString('vi-VN'),
+        status: statusMapping[order.status] || 'Chờ xác nhận' as OrderStatus,
+        total: order.total.toLocaleString('vi-VN') + ' đ'
+      }));
+  }, [orders, currentUser]);
 
   const handleAction = (id: string, action: string) => {
-    setOrders((prev) =>
-      prev.map((o) => {
-        if (o.id !== id) return o;
-        if (action === 'cancel') return { ...o, status: 'Đã hủy' };
-        if (action === 'received') return { ...o, status: 'Đã giao' };
-        if (action === 'return') return { ...o, status: 'Trả hàng' };
-        return o;
-      })
-    );
+    if (action === 'cancel') {
+      updateOrderStatus(id, 'cancelled');
+    } else if (action === 'received') {
+      updateOrderStatus(id, 'delivered');
+    }
   };
 
   const renderScene = SceneMap({
     ChoXacNhan: () => renderList('Chờ xác nhận'),
-    ChoLayHang: () => renderList('Chờ lấy hàng'),
-    ChoGiaoHang: () => renderList('Chờ giao hàng'),
+    DangXuLy: () => renderList('Đang xử lý'),
+    DangGiaoHang: () => renderList('Đang giao hàng'),
     DaGiao: () => renderList('Đã giao'),
-    TraHang: () => renderList('Trả hàng'),
     DaHuy: () => renderList('Đã hủy'),
   });
-
   const renderList = (status: OrderStatus) => {
-    const filtered = orders.filter((o) => o.status === status);
+    const filtered = displayOrders.filter((o) => o.status === status);
     return (
       <FlatList
         data={filtered}

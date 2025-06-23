@@ -17,7 +17,8 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const defaultUsers: User[] = [
-  { email: 'admin@test.com', password: 'admin123', role: 'admin' }
+  { email: 'admin', password: '123', role: 'admin' },
+  { email: 'user@test.com', password: 'user123', role: 'user' }
 ];
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {

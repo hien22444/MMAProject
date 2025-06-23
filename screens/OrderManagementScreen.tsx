@@ -7,51 +7,16 @@ import {
   TouchableOpacity, 
   TextInput,
   Modal,
-  ScrollView
+  ScrollView,
+  ActivityIndicator
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
-// Import dữ liệu mẫu
-import { orders } from '../data/orders';
-
-// Định nghĩa kiểu dữ liệu
-interface OrderProduct {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  color: string;
-  size: string;
-}
-
-interface ShippingAddress {
-  fullName: string;
-  phone: string;
-  address: string;
-  ward: string;
-  district: string;
-  city: string;
-}
-
-interface Order {
-  id: string;
-  userId: string;
-  customerName: string;
-  customerPhone: string;
-  customerEmail: string;
-  products: OrderProduct[];
-  shippingAddress: ShippingAddress;
-  paymentMethod: string;
-  status: string;
-  subTotal: number;
-  shippingFee: number;
-  discount: number;
-  total: number;
-  createdAt: string;
-  updatedAt: string;
-}
+// Import context
+import { useOrders, Order, OrderProduct, ShippingAddress } from '../contexts/OrderContext';
 
 const OrderManagementScreen = () => {
-  const [orderList, setOrderList] = useState<Order[]>(orders);
+  const { orders, updateOrderStatus } = useOrders();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -78,14 +43,9 @@ const OrderManagementScreen = () => {
       endDate
     });
   };
-
   // Xử lý cập nhật trạng thái đơn hàng
   const handleUpdateStatus = (orderId: string, newStatus: string) => {
-    setOrderList(
-      orderList.map(order => 
-        order.id === orderId ? { ...order, status: newStatus, updatedAt: new Date().toISOString() } : order
-      )
-    );
+    updateOrderStatus(orderId, newStatus);
     
     if (currentOrder && currentOrder.id === orderId) {
       setCurrentOrder({ ...currentOrder, status: newStatus, updatedAt: new Date().toISOString() });
@@ -150,14 +110,26 @@ const OrderManagementScreen = () => {
         return status;
     }
   };
-
   // Lọc đơn hàng theo tìm kiếm và bộ lọc
   const filteredOrders = (): Order[] => {
-    let result = [...orderList];
+    let result = [...orders];
     
     // Lọc theo trạng thái
     if (statusFilter) {
-      result = result.filter(order => order.status === statusFilter);
+      // Convert both to lowercase to prevent case-sensitive issues
+      let status = statusFilter.toLowerCase();
+      
+      // Map our UI status values to the actual status values in the data
+      const statusMapping: {[key: string]: string} = {
+        'pending': 'Chờ xác nhận',
+        'processing': 'Đang xử lý',
+        'shipping': 'Đang giao hàng',
+        'delivered': 'Đã giao hàng',
+        'cancelled': 'Đã hủy'
+      };
+      
+      const mappedStatus = statusMapping[status] || status;
+      result = result.filter(order => order.status.toLowerCase() === mappedStatus.toLowerCase());
     }
     
     // Lọc theo tìm kiếm
@@ -257,13 +229,12 @@ const OrderManagementScreen = () => {
           onChangeText={handleSearch}
         />
       </View>
-      
-      {/* Bộ lọc trạng thái */}
+        {/* Bộ lọc trạng thái */}
       <View style={styles.filterContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <TouchableOpacity 
             style={[styles.filterButton, statusFilter === null && styles.activeFilterButton]} 
-            onPress={() => handleStatusFilter('')}
+            onPress={() => setStatusFilter(null)}
           >
             <Text style={[styles.filterText, statusFilter === null && styles.activeFilterText]}>
               Tất cả

@@ -1,22 +1,26 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import MainNavigator from './navigation/MainNavigator';
-import ProfileScreen from './screens/ProfileScreen';
-import BottomTabNavigator from './navigation/BottomTabNavigator';
+import { StyleSheet } from 'react-native';
+import RootNavigator from './navigation/RootNavigator';
 import { CartProvider } from './contexts/CartContext';
 import { AuthProvider } from './contexts/AuthContext';
+import { ProductProvider } from './contexts/ProductContext';
+import { OrderProvider } from './contexts/OrderContext';
+import ErrorBoundary from './components/ErrorBoundary';
 
 export default function App() {
   return (
-    <AuthProvider>
-
-
-      <CartProvider>
-        <MainNavigator />
-
-      </CartProvider>
-      <StatusBar style="auto" />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <ProductProvider>
+          <OrderProvider>
+            <CartProvider>
+              <RootNavigator />
+            </CartProvider>
+          </OrderProvider>
+        </ProductProvider>
+        <StatusBar style="auto" />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
