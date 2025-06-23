@@ -3,6 +3,7 @@ import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, TextInput } 
 import { Product } from "../types/product";
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from "@react-navigation/native";
+import CardProduct from "../components/product/CardProduct";
 
 import aoThun from '../assets/ao_thun.jpg';
 import aoThunTrang from '../assets/ao_thun_trang.jpg';
@@ -22,37 +23,57 @@ const products: Product[] = [
   {
     id: '1',
     name: 'Áo Thun',
-    price: 'Từ 200,000₫',
+    price: '200,000₫',
     image: aoThun,
-    variants: [
-      { id: 'v1', name: 'Áo Thun Trắng', price: '200,000₫', image: aoThunTrang },
-      { id: 'v2', name: 'Áo Thun Đen', price: '210,000₫', image: aoThun },
-    ]
+    describe:'áo thun đẹp',
+    sold:'30,0K'
   },
   {
     id: '2',
     name: 'Quần Jeans',
     price: '450,000₫',
     image: quanJean,
+    describe:'áo thun đẹp',
+    sold:'30,0K'
   },
   {
     id: '3',
     name: 'Váy Nữ',
     price: '350,000₫',
     image: vay,
+    describe:'áo thun đẹp',
+    sold:'30,0K'
   },
   {
     id: '4',
     name: 'Vest Nam',
     price: '650,000₫',
     image: vest,
+    describe:'áo thun đẹp',
+    sold:'30,0K'
   },
   {
     id: '5',
     name: 'Áo Sơ Mi',
     price: '300,000₫',
     image: soMi,
+    describe:'áo thun đẹp',
+    sold:'30,0K'
   },
+  {
+    id: '6',
+    name: 'Áo Thun Trắng',
+    price: '200,000₫',
+    image: aoThunTrang,
+    describe:'áo thun đẹp',
+    sold:'30,0K'
+  },
+];
+
+const featuredCategories = [
+  { id: '1', label: '👗 Váy', value: 'Váy Nữ', image: vay },
+  { id: '2', label: '🤵 Vest', value: 'Vest Nam',image:vest },
+  { id: '3', label: '👔 Sơ Mi', value: 'Áo Sơ Mi',image: soMi },
 ];
 
 const Homepage: React.FC = () => {
@@ -100,17 +121,22 @@ const Homepage: React.FC = () => {
 
       {/* Danh mục */}
       <View style={styles.categoryContainer}>
-        <Text style={styles.filterTitle}>Các sản phẩm nổi bật:</Text>
-        <TouchableOpacity style={styles.categoryItem} onPress={() => setSelectedBrand('Váy Nữ')}>
-          <Text>👗 Váy</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.categoryItem} onPress={() => setSelectedBrand('Vest Nam')}>
-          <Text>🤵 Vest</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.categoryItem} onPress={() => setSelectedBrand('Áo Sơ Mi')}>
-          <Text>👔 Sơ Mi</Text>
-        </TouchableOpacity>
-      </View>
+  <Text style={styles.filterTitle}>Các sản phẩm nổi bật:</Text>
+  <FlatList
+    data={featuredCategories}
+    horizontal
+    keyExtractor={(item) => item.id}
+    renderItem={({ item }) => (
+      <TouchableOpacity
+        style={styles.categoryItem}
+        onPress={() => setSelectedBrand(item.value)}
+      >
+        <Image source={item.image} style={styles.categoryImage} />
+      </TouchableOpacity>
+    )}
+    showsHorizontalScrollIndicator={false}
+  />
+</View>
 
       {/* Bộ lọc Type */}
       <View style={styles.filterContainer}>
@@ -149,22 +175,15 @@ const Homepage: React.FC = () => {
 
       {/* Danh sách sản phẩm */}
       <FlatList
-        data={filteredProducts}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => navigation.navigate('ProductDetail', { product: item })}
-            style={styles.card}
-          >
-            <Image source={item.image} style={styles.productImage} />
-            <Text style={styles.productName}>{item.name}</Text>
-            <Text style={styles.productPrice}>{item.price}</Text>
-          </TouchableOpacity>
-        )}
-        numColumns={numColumns}
-        columnWrapperStyle={{ justifyContent: 'space-between' }}
-        contentContainerStyle={{ paddingBottom: 20 }}
-      />
+  data={filteredProducts}
+  keyExtractor={(item) => item.id}
+  numColumns={2}
+  columnWrapperStyle={{ justifyContent: 'space-between' }}
+  contentContainerStyle={{ paddingBottom: 20 }}
+  renderItem={({ item }) => (
+    <CardProduct product={item}/>
+  )}
+/>
     </View>
   );
 };
@@ -175,7 +194,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#90D7FF',
     borderRadius: 10,
     padding: 8,
     elevation: 3,
@@ -204,16 +223,83 @@ const styles = StyleSheet.create({
   },
 
   categoryContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 10,
-  },
-  categoryItem: {
-    backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 10,
-    elevation: 2,
-  },
+  marginBottom: 10,
+},
+
+categoryItem: {
+  backgroundColor: '#fff',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginRight: 10,
+  padding: 10,
+  borderRadius: 10,
+  elevation: 2,
+  width: 80,  // Kích thước cố định cho item
+  height: 100, // Để ảnh + text nằm gọn trong
+},
+
+categoryImage: {
+  width: 50,
+  height: 50,
+  borderRadius: 25, // bo tròn hình ảnh
+  marginBottom: 5,
+},
+card: {
+  backgroundColor: '#fff',
+  flex: 1,
+  margin: 5,
+  padding: 8,
+  borderRadius: 10,
+  elevation: 3,
+  position: 'relative',
+},
+
+productImage: {
+  width: '100%',
+  height: 120,
+  borderRadius: 10,
+  marginBottom: 5,
+},
+
+badgeContainer: {
+  position: 'absolute',
+  top: 8,
+  left: 8,
+  backgroundColor: 'orange',
+  paddingHorizontal: 5,
+  paddingVertical: 2,
+  borderRadius: 3,
+},
+
+badgeText: {
+  fontSize: 10,
+  color: '#fff',
+  fontWeight: 'bold',
+},
+
+productName: {
+  fontSize: 14,
+  fontWeight: 'bold',
+  color: '#333',
+  marginVertical: 2,
+},
+
+productPrice: {
+  fontSize: 14,
+  color: 'red',
+  fontWeight: 'bold',
+},
+
+productDescribe: {
+  fontSize: 12,
+  color: '#555',
+},
+
+productSold: {
+  fontSize: 12,
+  color: '#999',
+  marginTop: 2,
+},
 
   filterContainer: {
     flexDirection: 'row',
@@ -249,18 +335,7 @@ const styles = StyleSheet.create({
   },
   functionIcon: { fontSize: 24 },
 
-  card: {
-    backgroundColor: '#fff',
-    flex: 1,
-    margin: 5,
-    padding: 10,
-    borderRadius: 10,
-    alignItems: 'center',
-    elevation: 3,
-  },
-  productImage: { width: 100, height: 100, borderRadius: 10, marginBottom: 10 },
-  productName: { fontSize: 14, fontWeight: 'bold', color: '#333' },
-  productPrice: { fontSize: 12, color: '#888', marginTop: 5 },
+
   profileIcon: {
   width: 50,
   height: 50,
