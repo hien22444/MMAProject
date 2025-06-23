@@ -23,7 +23,9 @@ export type BottomTabParamList = {
   Home: undefined;
   Cart: { selectedCoupon?: string };
   Profile: undefined;
-  //   TestComponent: undefined;
+  TestComponent: undefined;
+  Review: undefined;
+  CreateReview: undefined;
 };
 
 // Thêm các màn hình khác nếu có
