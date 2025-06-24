@@ -37,12 +37,20 @@ const CartScreen: React.FC = () => {
   } = useCart();
   const navigation = useNavigation<CartScreenNavigationProp>();
   const route = useRoute<CartScreenRouteProp>();
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   useEffect(() => {
     if (route.params?.selectedCoupon) {
       setCoupon(route.params.selectedCoupon);
+      console.log("Coupon nhận được:", route.params.selectedCoupon);
     }
   }, [route.params?.selectedCoupon]);
+
+  const toggleSelectItem = (id: string) => {
+    setSelectedItems((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
 
   const calculateSubtotal = () => {
     return cartItems.reduce((total, item) => {

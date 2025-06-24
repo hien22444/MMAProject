@@ -1,76 +1,79 @@
-import React, { useContext } from 'react';
-import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, FlatList } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
-import { Product, ProductVariant } from '../types/product';
-import { useCart } from '../contexts/CartContext';
+import { Product } from '../types/product';
+import DetailProduct from '../components/product/DetailProduct';
+import ReviewList from '../components/Review/ReviewList';
 
 type ProductDetailRouteProp = RouteProp<{ ProductDetail: { product: Product } }, 'ProductDetail'>;
 
+const reviews = [
+  {
+    id: '1',
+    avatar: '',
+    fullname: 'Nguyễn Sỹ Đức',
+    email: 'ducns@gmail.com',
+    createdAt: '2023-06-22',
+    numStar: 4,
+    maxStar: 5,
+    content: 'Sản phẩm rất tốt, giao hàng nhanh chóng.',
+  },
+  {
+    id: '2',
+    avatar: '',
+    fullname: 'Trần Văn B',
+    email: 'tranb@gmail.com',
+    createdAt: '2023-06-20',
+    numStar: 5,
+    maxStar: 5,
+    content: 'Chất lượng tuyệt vời, sẽ ủng hộ tiếp.',
+  },
+  {
+    id: '3',
+    avatar: '',
+    fullname: 'Trần Văn B',
+    email: 'tranb@gmail.com',
+    createdAt: '2023-06-20',
+    numStar: 5,
+    maxStar: 5,
+    content: 'Chất lượng tuyệt vời, sẽ ủng hộ tiếp.',
+  },
+  {
+    id: '4',
+    avatar: '',
+    fullname: 'Trần Văn B',
+    email: 'tranb@gmail.com',
+    createdAt: '2023-06-20',
+    numStar: 5,
+    maxStar: 5,
+    content: 'Chất lượng tuyệt vời, sẽ ủng hộ tiếp.',
+  },
+  {
+    id: '5',
+    avatar: '',
+    fullname: 'Trần Văn B',
+    email: 'tranb@gmail.com',
+    createdAt: '2023-06-20',
+    numStar: 5,
+    maxStar: 5,
+    content: 'Chất lượng tuyệt vời, sẽ ủng hộ tiếp.',
+  },
+];
+
 const ProductDetail: React.FC = () => {
-  const { params } = useRoute<ProductDetailRouteProp>();
-  const { product } = params;
-  const { addToCart } = useCart();
-
-  const renderVariant = ({ item }: { item: ProductVariant }) => (
-    <View style={styles.card}>
-      <Image source={item.image} style={styles.image} />
-      <Text style={styles.productName}>{item.name}</Text>
-      <Text style={styles.productPrice}>{item.price}</Text>
-      <TouchableOpacity 
-        style={styles.button} 
-        onPress={() => addToCart(item)}
-      >
-        <Text style={styles.buttonText}>Thêm vào giỏ</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>{product.name}</Text>
-      {product.variants ? (
-        <FlatList
-          data={product.variants}
-          keyExtractor={(item) => item.id}
-          renderItem={renderVariant}
-          contentContainerStyle={{ paddingBottom: 20 }}
-        />
-      ) : (
-        <Text style={styles.noVariantText}>Không có sản phẩm này.</Text>
-      )}
-    </View>
+    <ScrollView contentContainerStyle={styles.container}>
+      <DetailProduct />
+      <ReviewList reviews={reviews} />
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 10, backgroundColor: '#f9f9f9' },
-  header: { fontSize: 26, textAlign: 'center', marginVertical: 15, fontWeight: 'bold', color: '#333' },
-  noVariantText: { textAlign: 'center', marginTop: 20, color: '#888', fontSize: 16 },
-
-  card: {
-    backgroundColor: '#fff',
+  container: {
     padding: 15,
-    borderRadius: 10,
-    marginVertical: 10,
+    backgroundColor: '#fff',
     alignItems: 'center',
-    elevation: 3, // Android shadow
-    shadowColor: '#000', // iOS shadow
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
   },
-  image: { width: 150, height: 150, borderRadius: 10, marginBottom: 10 },
-  productName: { fontSize: 18, fontWeight: 'bold', color: '#333' },
-  productPrice: { fontSize: 16, color: '#888', marginVertical: 5 },
-  
-  button: {
-    backgroundColor: '#ff6f61',
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    marginTop: 10,
-  },
-  buttonText: { color: '#fff', fontWeight: 'bold' },
 });
-
 export default ProductDetail;

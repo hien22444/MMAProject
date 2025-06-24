@@ -9,34 +9,32 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/navigation';
 
- import { NativeStackScreenProps } from '@react-navigation/native-stack';
+export default function ProfileScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-import { RootStackParamList } from '../types/navigation'; 
-
-type Props = NativeStackScreenProps<RootStackParamList, 'Profile'>;
-
-export default function ProfileScreen({ navigation }: Props) {
-  
-
-
-const handlePress = (label: string) => {
-    if (label === 'Danh sách yêu thích') {
-      navigation.navigate('Wishlist');
-    } 
-    else if (label === 'Đơn hàng của tôi') {
-      navigation.navigate('OrderHistory')}
-      else if (label === 'Địa chỉ giao hàng') {
-        navigation.navigate('ShippingAddress')}
-        else if (label === 'Cài đặt tài khoản') {
-          navigation.navigate('AccountSettings')}
-          else if (label === 'Trung tâm trợ giúp') {
-            navigation.navigate('HelpCenter')}
-      else {
+  const handlePress = (label: string) => {
+    // if (label === 'Danh sách yêu thích') {
+    //   navigation.navigate('Wishlist');
+    if (label === 'Đơn hàng của tôi') {
+      navigation.navigate('OrderHistory');
+    } else if (label === 'Địa chỉ giao hàng') {
+      navigation.navigate('ShippingAddress');
+    } else if (label === 'Cài đặt tài khoản') {
+      navigation.navigate('AccountSettings');
+    } else if (label === 'Trung tâm trợ giúp') {
+      navigation.navigate('HelpCenter');
+    } else if (label === 'Chính sách & Điều khoản') {
+      navigation.navigate('Policy');
+    } else if (label === 'Chỉnh sửa hồ sơ') {
+      navigation.navigate('MyProfile');
+    } else {
       Alert.alert('Tính năng', `Bạn đã chọn: ${label}`);
     }
   };
-  
 
   return (
     <ScrollView style={styles.container}>
@@ -58,15 +56,16 @@ const handlePress = (label: string) => {
             onPress={() => handlePress('Chỉnh sửa hồ sơ')}
           >
             <Ionicons name="create-outline" size={20} color="#fff" />
+            {/* {renderItem('Chỉnh sửa hồ sơ', 'create-outline')} */}
             <Text style={styles.actionText}>Chỉnh sửa</Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.actionButton}
             onPress={() => handlePress('Đổi mật khẩu')}
           >
             <Ionicons name="lock-closed-outline" size={20} color="#fff" />
             <Text style={styles.actionText}>Đổi mật khẩu</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
 
@@ -74,7 +73,7 @@ const handlePress = (label: string) => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Tài khoản</Text>
         {renderItem('Đơn hàng của tôi', 'cube-outline')}
-        {renderItem('Danh sách yêu thích', 'heart-outline')}
+        {/* {renderItem('Danh sách yêu thích', 'heart-outline')} */}
         {renderItem('Địa chỉ giao hàng', 'location-outline')}
       </View>
 
@@ -90,10 +89,7 @@ const handlePress = (label: string) => {
 
   function renderItem(label: string, iconName: any) {
     return (
-      <TouchableOpacity
-        style={styles.item}
-        onPress={() => handlePress(label)}
-      >
+      <TouchableOpacity style={styles.item} onPress={() => handlePress(label)}>
         <Ionicons name={iconName} size={22} color="#444" style={styles.itemIcon} />
         <Text style={styles.itemLabel}>{label}</Text>
       </TouchableOpacity>
