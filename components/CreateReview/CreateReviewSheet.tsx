@@ -3,12 +3,28 @@ import React, { useState } from "react";
 import BottomSheet from "../BottomSheet/BottomSheet";
 import Entypo from "@expo/vector-icons/Entypo";
 import GlobalColors from "../../constants/colors";
+import { useRoute } from "@react-navigation/native";
 
 export default function CreateReviewSheet({
   isModalOpen,
   setIsModalOpen,
 }: any) {
-  const [numStar, setNumStar] = useState(0);
+  const route = useRoute();
+  const productId = "123";
+  const userId = "123";
+
+  const [newReview, setNewReview] = useState({
+    numStar: 0,
+    comment: "",
+    productId,
+    userId,
+  });
+
+  const handleCreateReview = () => {
+    console.log(newReview);
+    setIsModalOpen(false);
+    setNewReview({ numStar: 0, comment: "", productId, userId });
+  };
 
   return (
     <BottomSheet isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
@@ -17,13 +33,15 @@ export default function CreateReviewSheet({
         {[...Array(5)].map((_, index) => (
           <Pressable
             key={index}
-            onPress={() => setNumStar(index + 1)}
+            onPress={() =>
+              setNewReview((prev) => ({ ...prev, numStar: index + 1 }))
+            }
             style={styles.star}
           >
             <Entypo
-              name={index + 1 <= numStar ? "star" : "star-outlined"}
+              name={index + 1 <= newReview.numStar ? "star" : "star-outlined"}
               size={30}
-              color={index + 1 <= numStar ? "gold" : "gray"}
+              color={index + 1 <= newReview.numStar ? "gold" : "gray"}
             />
           </Pressable>
         ))}
@@ -33,7 +51,16 @@ export default function CreateReviewSheet({
         Please share your opinion about the product
       </Text>
 
-      <TextInput multiline numberOfLines={4} style={styles.comment} />
+      <TextInput
+        multiline
+        numberOfLines={4}
+        style={styles.comment}
+        onChangeText={(text) =>
+          setNewReview((prev) => ({ ...prev, comment: text }))
+        }
+        value={newReview.comment}
+        placeholder="Your review here..."
+      />
 
       <View style={styles.cameraContainer}>
         <Pressable style={styles.cameraInnerContainer}>
@@ -46,13 +73,27 @@ export default function CreateReviewSheet({
 
       <View style={styles.buttonGroup}>
         <View style={styles.buttonContainer}>
-          <Pressable style={styles.buttonInnerContainer}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.buttonInnerContainer,
+              pressed && { opacity: 0.5 },
+            ]}
+            onPress={handleCreateReview}
+          >
             <Text style={styles.buttonText}>Submit</Text>
           </Pressable>
         </View>
-        <View style={styles.buttonContainer}>
+        <View
+          style={[
+            styles.buttonContainer,
+            { backgroundColor: GlobalColors.gray },
+          ]}
+        >
           <Pressable
-            style={styles.buttonInnerContainer}
+            style={({ pressed }) => [
+              styles.buttonInnerContainer,
+              pressed && { opacity: 0.5 },
+            ]}
             onPress={() => setIsModalOpen(false)}
           >
             <Text style={styles.buttonText}>Cancel</Text>
@@ -70,6 +111,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
   },
+
+  star: {},
 
   title: {
     fontSize: 20,
@@ -128,13 +171,14 @@ const styles = StyleSheet.create({
   buttonGroup: {
     flexDirection: "row",
     justifyContent: "space-between",
+    gap: 10,
     alignItems: "center",
   },
 
   buttonContainer: {
     backgroundColor: GlobalColors.primary,
     width: "45%",
-    borderRadius: 20,
+    borderRadius: 5,
   },
   buttonInnerContainer: {
     width: "100%",

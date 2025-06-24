@@ -5,9 +5,9 @@ import Homepage from "../screens/Homepage";
 import ProfileScreen from "../screens/ProfileScreen";
 import CartScreen from "../screens/CartScreen";
 import { Ionicons } from "@expo/vector-icons";
-import TestComponentScreen from "../screens/TestComponentScreen";
+import ChatScreen from "../screens/ChatScreen";
 import AllReviewScreen from "../screens/AllReviewScreen";
-import CreateReviewScreen from "../screens/CreateReviewScreen";
+import CouponScreen from "../screens/CouponScreen";
 
 const Tab = createBottomTabNavigator<BottomTabParamList>();
 
@@ -15,8 +15,9 @@ export default function TabNavigator() {
   return (
     <Tab.Navigator>
       <Tab.Screen name="Review" component={AllReviewScreen} />
-      <Tab.Screen name="CreateReview" component={CreateReviewScreen} />
-      <Tab.Screen name="TestComponent" component={TestComponentScreen} />
+      <Tab.Screen name="Coupons" component={CouponScreen} />
+
+      <Tab.Screen name="Chat" component={ChatScreen} />
 
       <Tab.Screen
         name="Home"

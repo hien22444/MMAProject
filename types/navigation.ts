@@ -13,7 +13,7 @@ export type RootStackParamList = {
 
   Payment: { totalAmount: number };
 
-  Coupon: undefined;
+  Coupon: { totalAmount: number };
   HelpCenter: undefined;
   ProductDetail: undefined;
   Checkout: undefined;
@@ -23,9 +23,10 @@ export type BottomTabParamList = {
   Home: undefined;
   Cart: { selectedCoupon?: string };
   Profile: undefined;
-  TestComponent: undefined;
+  Chat: undefined;
   Review: undefined;
   CreateReview: undefined;
+  Coupons: undefined;
 };
 
 // Thêm các màn hình khác nếu có
