@@ -1,7 +1,3 @@
-import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
-import React from "react";
-import ReviewBox from "../components/Review/ReviewBox";
-import CreateReviewSheet from "../components/CreateReview/CreateReviewSheet";
 const reviews = [
   {
     id: "1",
@@ -60,69 +56,4 @@ const reviews = [
   },
 ];
 
-export default function AllReviewScreen() {
-  const renderReview = ({ item }: any) => <ReviewBox {...item} />;
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-
-  return (
-    <>
-      <View style={styles.container}>
-        <Text style={styles.title}>All reviews</Text>
-
-        <View style={styles.buttonContainer}>
-          <Pressable
-            style={styles.buttonInnerContainer}
-            onPress={() => setIsModalOpen(true)}
-          >
-            <Text style={styles.buttonText}>Create Review</Text>
-          </Pressable>
-        </View>
-
-        <View>
-          <FlatList
-            data={reviews}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={renderReview}
-          />
-        </View>
-      </View>
-      {isModalOpen && (
-        <CreateReviewSheet
-          isModalOpen={isModalOpen}
-          setIsModalOpen={setIsModalOpen}
-        />
-      )}
-    </>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    padding: 10,
-    position: "relative",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 10,
-    color: "#333",
-  },
-
-  buttonContainer: {
-    marginBottom: 10,
-    width: 150,
-  },
-  buttonInnerContainer: {
-    backgroundColor: "#ff6f61",
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-});
+export default reviews;

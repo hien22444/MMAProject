@@ -1,17 +1,7 @@
-import React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
-import ReviewBox from './ReviewBox'; // Đường dẫn đúng nếu trong cùng thư mục
-
-type Review = {
-  id: string;
-  avatar: string;
-  fullname: string;
-  email: string;
-  createdAt: string;
-  numStar: number;
-  maxStar: number;
-  content: string;
-};
+import React from "react";
+import { View, Text, FlatList, StyleSheet } from "react-native";
+import ReviewBox from "./ReviewBox";
+import { Review } from "../../types/review";
 
 type ReviewListProps = {
   reviews: Review[];
@@ -45,15 +35,15 @@ const ReviewList: React.FC<ReviewListProps> = ({ reviews }) => {
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
+    width: "100%",
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginVertical: 10,
   },
   list: {
-    width: '100%',
+    width: "100%",
   },
 });
 

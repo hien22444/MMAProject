@@ -10,7 +10,7 @@ import AccountSettingsScreen from "../screens/AccountSettingsScreen";
 import HelpCenterScreen from "../screens/HelpCenterScreen";
 import SupportScreen from "../screens/SupportScreen";
 import OrderDetailScreen from "../screens/OrderDetailScreen";
-import ReviewScreen from "../screens/ReviewScreen";
+import AllReviewScreen from "../screens/AllReviewScreen";
 import PaymentScreen from "../screens/PaymentScreen";
 import CouponScreen from "../screens/CouponScreen";
 import ProfileScreen from "../screens/ProfileScreen";
@@ -39,11 +39,7 @@ export default function MainNavigator() {
           component={TabNavigator}
           options={{ headerShown: false }}
         />
-        <Stack.Screen
-          name="Tab"
-          component={TabNavigator}
-          options={{ headerShown: false }}
-        />
+
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="Wishlist" component={WishlistScreen} />
         <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
@@ -113,7 +109,7 @@ export default function MainNavigator() {
         />
         <Stack.Screen
           name="Review"
-          component={ReviewScreen}
+          component={AllReviewScreen}
           options={{ title: "Đánh giá" }}
         />
         <Stack.Screen

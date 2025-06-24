@@ -6,18 +6,12 @@ import ProfileScreen from "../screens/ProfileScreen";
 import CartScreen from "../screens/CartScreen";
 import { Ionicons } from "@expo/vector-icons";
 import ChatScreen from "../screens/ChatScreen";
-import AllReviewScreen from "../screens/AllReviewScreen";
-import CouponScreen from "../screens/CouponScreen";
 
 const Tab = createBottomTabNavigator<BottomTabParamList>();
 
 export default function TabNavigator() {
   return (
     <Tab.Navigator>
-      <Tab.Screen name="Review" component={AllReviewScreen} />
-
-      <Tab.Screen name="Chat" component={ChatScreen} />
-
       <Tab.Screen
         name="Home"
         component={Homepage}
@@ -33,6 +27,15 @@ export default function TabNavigator() {
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="cart-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Chat"
+        component={ChatScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="chatbubbles-outline" size={size} color={color} />
           ),
         }}
       />

@@ -15,31 +15,31 @@ export type RootStackParamList = {
 
   Coupon: { totalAmount: number };
   HelpCenter: undefined;
-    Tabs: undefined;
-    
+  Tabs: undefined;
+
   ProductDetail: undefined;
   Checkout: undefined;
   Login: undefined;
-    Register:undefined;
-    
-    ProductList: undefined;
-    Search: undefined;
-    Address: undefined;
-    Notification: undefined;
-    ProductManagement: undefined;
-    OrderManagement: undefined;
-    CategoryManagement: undefined;
-    Analytics: undefined;
-    Policy: undefined;
-    AccountSecurity:undefined;
-    MyProfile:undefined;
+  Register: undefined;
+
+  ProductList: undefined;
+  Search: undefined;
+  Address: undefined;
+  Notification: undefined;
+  ProductManagement: undefined;
+  OrderManagement: undefined;
+  CategoryManagement: undefined;
+  Analytics: undefined;
+  Policy: undefined;
+  AccountSecurity: undefined;
+  MyProfile: undefined;
 };
 export type BottomTabParamList = {
   Home: undefined;
   Cart: { selectedCoupon?: string };
   Profile: undefined;
   Chat: undefined;
-  Review: undefined;
+
   CreateReview: undefined;
   Coupons: undefined;
 };
