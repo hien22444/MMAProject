@@ -1,36 +1,70 @@
-import React, { useContext } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, FlatList } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { Product } from '../types/product';
-import { useCart } from '../contexts/CartContext';
+import DetailProduct from '../components/product/DetailProduct';
+import ReviewList from '../components/Review/ReviewList';
 
 type ProductDetailRouteProp = RouteProp<{ ProductDetail: { product: Product } }, 'ProductDetail'>;
 
-const ProductDetail: React.FC = () => {
-  const { params } = useRoute<ProductDetailRouteProp>();
-  const { product } = params;
-  const { addToCart } = useCart();
+const reviews = [
+  {
+    id: '1',
+    avatar: '',
+    fullname: 'Nguyễn Sỹ Đức',
+    email: 'ducns@gmail.com',
+    createdAt: '2023-06-22',
+    numStar: 4,
+    maxStar: 5,
+    content: 'Sản phẩm rất tốt, giao hàng nhanh chóng.',
+  },
+  {
+    id: '2',
+    avatar: '',
+    fullname: 'Trần Văn B',
+    email: 'tranb@gmail.com',
+    createdAt: '2023-06-20',
+    numStar: 5,
+    maxStar: 5,
+    content: 'Chất lượng tuyệt vời, sẽ ủng hộ tiếp.',
+  },
+  {
+    id: '3',
+    avatar: '',
+    fullname: 'Trần Văn B',
+    email: 'tranb@gmail.com',
+    createdAt: '2023-06-20',
+    numStar: 5,
+    maxStar: 5,
+    content: 'Chất lượng tuyệt vời, sẽ ủng hộ tiếp.',
+  },
+  {
+    id: '4',
+    avatar: '',
+    fullname: 'Trần Văn B',
+    email: 'tranb@gmail.com',
+    createdAt: '2023-06-20',
+    numStar: 5,
+    maxStar: 5,
+    content: 'Chất lượng tuyệt vời, sẽ ủng hộ tiếp.',
+  },
+  {
+    id: '5',
+    avatar: '',
+    fullname: 'Trần Văn B',
+    email: 'tranb@gmail.com',
+    createdAt: '2023-06-20',
+    numStar: 5,
+    maxStar: 5,
+    content: 'Chất lượng tuyệt vời, sẽ ủng hộ tiếp.',
+  },
+];
 
+const ProductDetail: React.FC = () => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Image source={product.image} style={styles.image} />
-
-      <Text style={styles.name}>{product.name}</Text>
-      <Text style={styles.price}>{product.price}</Text>
-
-      {/* Mô tả chi tiết */}
-      <Text style={styles.describe}>{product.describe}</Text>
-
-      {/* Đã bán */}
-      <Text style={styles.sold}>Đã bán: {product.sold}</Text>
-
-      {/* Nút thêm vào giỏ */}
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => addToCart(product)}
-      >
-        <Text style={styles.buttonText}>Thêm vào giỏ hàng</Text>
-      </TouchableOpacity>
+      <DetailProduct />
+      <ReviewList reviews={reviews} />
     </ScrollView>
   );
 };
@@ -41,47 +75,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
   },
-  image: {
-    width: '100%',
-    height: 250,
-    borderRadius: 10,
-    marginBottom: 15,
-  },
-  name: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  price: {
-    fontSize: 20,
-    color: 'red',
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  describe: {
-    fontSize: 16,
-    color: '#555',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  sold: {
-    fontSize: 14,
-    color: '#888',
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: '#ff6f61',
-    paddingVertical: 10,
-    paddingHorizontal: 30,
-    borderRadius: 25,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
 });
-
 export default ProductDetail;
