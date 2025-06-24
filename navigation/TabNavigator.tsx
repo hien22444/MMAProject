@@ -15,7 +15,6 @@ export default function TabNavigator() {
   return (
     <Tab.Navigator>
       <Tab.Screen name="Review" component={AllReviewScreen} />
-      <Tab.Screen name="Coupons" component={CouponScreen} />
 
       <Tab.Screen name="Chat" component={ChatScreen} />
 
