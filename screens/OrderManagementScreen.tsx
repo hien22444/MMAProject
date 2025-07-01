@@ -116,20 +116,7 @@ const OrderManagementScreen = () => {
     
     // Lọc theo trạng thái
     if (statusFilter) {
-      // Convert both to lowercase to prevent case-sensitive issues
-      let status = statusFilter.toLowerCase();
-      
-      // Map our UI status values to the actual status values in the data
-      const statusMapping: {[key: string]: string} = {
-        'pending': 'Chờ xác nhận',
-        'processing': 'Đang xử lý',
-        'shipping': 'Đang giao hàng',
-        'delivered': 'Đã giao hàng',
-        'cancelled': 'Đã hủy'
-      };
-      
-      const mappedStatus = statusMapping[status] || status;
-      result = result.filter(order => order.status.toLowerCase() === mappedStatus.toLowerCase());
+      result = result.filter(order => order.status === statusFilter);
     }
     
     // Lọc theo tìm kiếm

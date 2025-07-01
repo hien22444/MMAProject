@@ -18,7 +18,7 @@ export default function Star({
             key={index}
             name={index < numStar ? "star" : "star-outlined"}
             size={20}
-            color="yellow"
+            color={index < numStar ? "yellow" : "#ccc"}
           />
         ))}
     </View>

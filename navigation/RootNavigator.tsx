@@ -14,7 +14,7 @@ import AccountSettingsScreen from '../screens/AccountSettingsScreen';
 import HelpCenterScreen from '../screens/HelpCenterScreen';
 import SupportScreen from '../screens/SupportScreen';
 import OrderDetailScreen from '../screens/OrderDetailScreen';
-import ReviewScreen from '../screens/ReviewScreen';
+import ReviewScreen from '../screens/AllReviewScreen';
 import PaymentScreen from '../screens/PaymentScreen';
 import CouponScreen from '../screens/CouponScreen';
 import ProfileScreen from '../screens/ProfileScreen';

@@ -26,11 +26,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   const login = (email: string, password: string): boolean => {
+    console.log('AuthContext login attempt:', email, password);
+    console.log('Available users:', registeredUsers);
     const user = registeredUsers.find(u => u.email === email && u.password === password);
+    console.log('Found user:', user);
     if (user) {
       setCurrentUser(user);
+      console.log('Login successful, user role:', user.role);
       return true;
     }
+    console.log('Login failed');
     return false;
   };
 

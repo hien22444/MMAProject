@@ -132,8 +132,14 @@ export default function OrderHistoryScreen() {
 
   // Get user orders
   const userOrders = useMemo(() => {
-    if (!currentUser) return [];
-    return getUserOrders(currentUser.email);
+    if (!currentUser) {
+      console.log('No current user');
+      return [];
+    }
+    console.log('Getting orders for user:', currentUser.email);
+    const orders = getUserOrders(currentUser.email);
+    console.log('Found orders:', orders.length);
+    return orders;
   }, [currentUser, getUserOrders]);
 
   const handleAction = (id: string, action: string) => {
@@ -154,13 +160,6 @@ export default function OrderHistoryScreen() {
     }
   };
 
-  const renderScene = SceneMap({
-    All: () => renderList(null),
-    Pending: () => renderList('pending'),
-    Shipping: () => renderList('shipping'),
-    Delivered: () => renderList('delivered'),
-    Cancelled: () => renderList('cancelled'),
-  });
   const renderList = (status: string | null) => {
     const filtered = status
       ? userOrders.filter((order) => order.status === status)
@@ -190,6 +189,14 @@ export default function OrderHistoryScreen() {
       </View>
     );
   };
+
+  const renderScene = SceneMap({
+    All: () => renderList(null),
+    Pending: () => renderList('pending'),
+    Shipping: () => renderList('shipping'),
+    Delivered: () => renderList('delivered'),
+    Cancelled: () => renderList('cancelled'),
+  });
 
   return (
     <View style={styles.container}>

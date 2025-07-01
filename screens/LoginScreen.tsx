@@ -30,7 +30,9 @@ export default function Login({ navigation }: Props) {
 
   const handleLogin = () => {
     setError('');
+    console.log('Attempting login with:', username, password);
     const success = login(username, password);
+    console.log('Login result:', success);
     
     if (!success) {
       setError('Invalid username or password');
@@ -74,6 +76,30 @@ export default function Login({ navigation }: Props) {
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
       
+      {/* Test buttons */}
+      <View style={styles.testContainer}>
+        <Text style={styles.testTitle}>Quick Test:</Text>
+        <TouchableOpacity 
+          style={[styles.button, { backgroundColor: '#28a745' }]} 
+          onPress={() => {
+            setUsername('admin');
+            setPassword('123');
+          }}
+        >
+          <Text style={styles.buttonText}>Fill Admin Credentials</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={[styles.button, { backgroundColor: '#007bff' }]} 
+          onPress={() => {
+            setUsername('user@test.com');
+            setPassword('user123');
+          }}
+        >
+          <Text style={styles.buttonText}>Fill User Credentials</Text>
+        </TouchableOpacity>
+      </View>
+      
       <View style={styles.footer}>
         <Text style={styles.footerText}>Don't have an account?</Text>
         <TouchableOpacity onPress={() => navigation.navigate('Register')}>
@@ -82,7 +108,8 @@ export default function Login({ navigation }: Props) {
       </View>
       
       <View style={styles.hint}>
-        <Text style={styles.hintText}>Hint: For admin access, use "admin" / "123"</Text>
+        <Text style={styles.hintText}>Admin: admin / 123</Text>
+        <Text style={styles.hintText}>User: user@test.com / user123</Text>
       </View>
     </View>
   );
@@ -155,5 +182,14 @@ const styles = StyleSheet.create({
   hintText: {
     color: '#888',
     fontSize: 12
+  },
+  testContainer: {
+    marginVertical: 20,
+    alignItems: 'center'
+  },
+  testTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10
   }
 });

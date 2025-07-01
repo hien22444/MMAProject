@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -12,8 +12,8 @@ import {
   Alert
 } from 'react-native';
 
-// Import dữ liệu mẫu
-import { categories as categoriesData } from '../data/categories';
+// Import ProductContext
+import { useProducts } from '../contexts/ProductContext';
 
 // Định nghĩa kiểu dữ liệu
 interface Category {
@@ -25,7 +25,8 @@ interface Category {
 }
 
 const CategoryManagementScreen = () => {
-  const [categories, setCategories] = useState<Category[]>(categoriesData);
+  const { products } = useProducts();
+  const [categories, setCategories] = useState<Category[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [currentCategory, setCurrentCategory] = useState<Category | null>(null);
@@ -34,6 +35,36 @@ const CategoryManagementScreen = () => {
     description: '',
     imageUrl: ''
   });
+
+  // Generate categories from products
+  useEffect(() => {
+    const categoryMap = new Map<string, { count: number; imageUrl: string }>();
+    
+    products.forEach(product => {
+      if (categoryMap.has(product.category)) {
+        const existing = categoryMap.get(product.category)!;
+        categoryMap.set(product.category, {
+          count: existing.count + 1,
+          imageUrl: existing.imageUrl
+        });
+      } else {
+        categoryMap.set(product.category, {
+          count: 1,
+          imageUrl: product.imageUrl
+        });
+      }
+    });
+
+    const generatedCategories: Category[] = Array.from(categoryMap.entries()).map(([name, data], index) => ({
+      id: `cat-${index + 1}`,
+      name,
+      imageUrl: data.imageUrl,
+      description: `Danh mục ${name} với ${data.count} sản phẩm`,
+      productCount: data.count
+    }));
+
+    setCategories(generatedCategories);
+  }, [products]);
 
   // Xử lý tìm kiếm
   const handleSearch = (text: string) => {

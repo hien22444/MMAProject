@@ -16,15 +16,15 @@ export type RootStackParamList = {
 
   Payment: { totalAmount: number };
 
-  Coupon: undefined;
+  Coupon: { totalAmount: number };
   HelpCenter: undefined;
   Tabs: undefined;
-    
+
   ProductDetail: { product: Product };
   Checkout: undefined;
   Login: undefined;
   Register: undefined;
-    
+
   ProductList: undefined;
   Search: undefined;
   Address: undefined;
@@ -36,21 +36,23 @@ export type RootStackParamList = {
   Policy: undefined;
   AccountSecurity: undefined;
   MyProfile: undefined;
-  UserManager: undefined;
 };
 
 export type BottomTabParamList = {
   Home: undefined;
   Cart: { selectedCoupon?: string };
   Profile: undefined;
-  //   TestComponent: undefined;
+  Chat: undefined;
+
+  CreateReview: undefined;
+  Coupons: undefined;
 };
 
 export type AdminTabParamList = {
   ProductManagement: undefined;
   OrderManagement: undefined;
-  CategoryManagement: undefined;
   Analytics: undefined;
+  CategoryManagement: undefined;
   UserManager: undefined;
 };
 

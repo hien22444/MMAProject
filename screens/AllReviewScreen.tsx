@@ -1,20 +1,7 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  FlatList,
-  Pressable,
-} from "react-native";
-import { RouteProp, useRoute } from "@react-navigation/native";
-import { Product } from "../types/product";
-import DetailProduct from "../components/product/DetailProduct";
-import ReviewList from "../components/Review/ReviewList";
-import { useNavigation } from "@react-navigation/native";
-import { RootStackParamList } from "../types/navigation";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-
+import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
+import React from "react";
+import ReviewBox from "../components/Review/ReviewBox";
+import CreateReviewSheet from "../components/CreateReview/CreateReviewSheet";
 const reviews = [
   {
     id: "1",
@@ -73,54 +60,69 @@ const reviews = [
   },
 ];
 
-type ProductDetailRouteProp = RouteProp<
-  { ProductDetail: { product: Product } },
-  "ProductDetail"
->;
-
-type ReviewScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "Review"
->;
-
-const ProductDetail: React.FC = () => {
-  const navigation = useNavigation<ReviewScreenNavigationProp>();
+export default function AllReviewScreen() {
+  const renderReview = ({ item }: any) => <ReviewBox {...item} />;
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <DetailProduct />
-      <ReviewList reviews={reviews.slice(0, 2)} />
-      <View
-        style={{
-          width: "100%",
-          alignItems: "flex-end",
-          justifyContent: "center",
-        }}
-      >
-        <Pressable
-          style={{
-            paddingVertical: 5,
-            paddingHorizontal: 10,
-            borderRadius: 5,
-          }}
-          android_ripple={{ color: "#FF6F61" }}
-          onPress={() => {
-            navigation.navigate("Review");
-          }}
-        >
-          <Text style={{ color: "#FF6F61" }}>Xem thêm đánh giá &gt;&gt;</Text>
-        </Pressable>
+    <>
+      <View style={styles.container}>
+        <Text style={styles.title}>All reviews</Text>
+
+        <View style={styles.buttonContainer}>
+          <Pressable
+            style={styles.buttonInnerContainer}
+            onPress={() => setIsModalOpen(true)}
+          >
+            <Text style={styles.buttonText}>Create Review</Text>
+          </Pressable>
+        </View>
+
+        <View>
+          <FlatList
+            data={reviews}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={renderReview}
+          />
+        </View>
       </View>
-    </ScrollView>
+      {isModalOpen && (
+        <CreateReviewSheet
+          isModalOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
+        />
+      )}
+    </>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
-    padding: 15,
-    paddingBottom: 30,
+    flex: 1,
     backgroundColor: "#fff",
-    alignItems: "center",
+    padding: 10,
+    position: "relative",
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#333",
+  },
+
+  buttonContainer: {
+    marginBottom: 10,
+    width: 150,
+  },
+  buttonInnerContainer: {
+    backgroundColor: "#ff6f61",
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
-export default ProductDetail;

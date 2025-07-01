@@ -212,7 +212,11 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
   };
 
   const getUserOrders = (userEmail: string) => {
-    return orders.filter(order => order.userId === userEmail || order.customerEmail === userEmail);
+    console.log('getUserOrders called with:', userEmail);
+    console.log('Available orders:', orders.length);
+    const userOrders = orders.filter(order => order.userId === userEmail || order.customerEmail === userEmail);
+    console.log('Filtered user orders:', userOrders.length);
+    return userOrders;
   };
 
   return (
