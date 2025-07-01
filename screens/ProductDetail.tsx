@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
-import { Product } from '../types/product';
+import { Product } from '../contexts/ProductContext';
 import { useCart } from '../contexts/CartContext';
 
 type ProductDetailRouteProp = RouteProp<{ ProductDetail: { product: Product } }, 'ProductDetail'>;
@@ -13,16 +13,35 @@ const ProductDetail: React.FC = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Image source={product.image} style={styles.image} />
+      <Image source={{ uri: product.imageUrl }} style={styles.image} />
 
       <Text style={styles.name}>{product.name}</Text>
-      <Text style={styles.price}>{product.price}</Text>
+      <Text style={styles.price}>{product.price.toLocaleString('vi-VN')}₫</Text>
 
       {/* Mô tả chi tiết */}
-      <Text style={styles.describe}>{product.describe}</Text>
+      <Text style={styles.describe}>{product.description}</Text>
 
-      {/* Đã bán */}
-      <Text style={styles.sold}>Đã bán: {product.sold}</Text>
+      {/* Thông tin thêm */}
+      <Text style={styles.category}>Danh mục: {product.category}</Text>
+      <Text style={styles.brand}>Thương hiệu: {product.brand}</Text>
+      <Text style={styles.inStock}>Còn lại: {product.inStock} sản phẩm</Text>
+      <Text style={styles.rating}>Đánh giá: {product.rating} ⭐</Text>
+
+      {/* Màu sắc */}
+      {product.colors && product.colors.length > 0 && (
+        <View style={styles.colorsContainer}>
+          <Text style={styles.label}>Màu sắc:</Text>
+          <Text style={styles.colors}>{product.colors.join(', ')}</Text>
+        </View>
+      )}
+
+      {/* Kích thước */}
+      {product.sizes && product.sizes.length > 0 && (
+        <View style={styles.sizesContainer}>
+          <Text style={styles.label}>Kích thước:</Text>
+          <Text style={styles.sizes}>{product.sizes.join(', ')}</Text>
+        </View>
+      )}
 
       {/* Nút thêm vào giỏ */}
       <TouchableOpacity
@@ -63,13 +82,50 @@ const styles = StyleSheet.create({
   describe: {
     fontSize: 16,
     color: '#555',
-    marginBottom: 10,
+    marginBottom: 15,
     textAlign: 'center',
   },
-  sold: {
+  category: {
     fontSize: 14,
-    color: '#888',
+    color: '#666',
+    marginBottom: 5,
+  },
+  brand: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 5,
+  },
+  inStock: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 5,
+  },
+  rating: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 15,
+  },
+  colorsContainer: {
+    marginBottom: 10,
+    alignItems: 'center',
+  },
+  sizesContainer: {
     marginBottom: 20,
+    alignItems: 'center',
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 5,
+  },
+  colors: {
+    fontSize: 14,
+    color: '#555',
+  },
+  sizes: {
+    fontSize: 14,
+    color: '#555',
   },
   button: {
     backgroundColor: '#ff6f61',

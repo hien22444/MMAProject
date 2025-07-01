@@ -9,9 +9,12 @@ import {
   Image,
   ScrollView
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-// Import dữ liệu mẫu
-import { products } from '../data/products';
+// Import ProductContext thay vì data trực tiếp
+import { useProducts, Product } from '../contexts/ProductContext';
+import { RootStackParamList } from '../types/navigation';
 
 // Dữ liệu mẫu tìm kiếm gần đây
 const recentSearches = [
@@ -34,28 +37,15 @@ const popularKeywords = [
   'Đồng hồ'
 ];
 
-// Định nghĩa kiểu dữ liệu
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  imageUrl: string;
-  category: string;
-  inStock: number;
-  rating: number;
-  brand: string;
-  colors: string[];
-  sizes: string[];
-  createdAt: string;
-  isFeatured: boolean;
-}
-
 const SearchScreen = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [recentSearchList, setRecentSearchList] = useState<string[]>(recentSearches);
+  
+  // Get products from context
+  const { products } = useProducts();
 
   // Xử lý tìm kiếm
   const handleSearch = (text: string) => {
@@ -65,7 +55,7 @@ const SearchScreen = () => {
       setIsSearching(true);
       
       // Lọc sản phẩm theo từ khóa tìm kiếm
-      const results = products.filter(product => 
+      const results = products.filter((product: Product) => 
         product.name.toLowerCase().includes(text.toLowerCase()) ||
         product.description.toLowerCase().includes(text.toLowerCase()) ||
         product.category.toLowerCase().includes(text.toLowerCase()) ||
@@ -109,7 +99,10 @@ const SearchScreen = () => {
 
   // Render item trong danh sách kết quả tìm kiếm
   const renderSearchResultItem = ({ item }: { item: Product }) => (
-    <TouchableOpacity style={styles.productItem}>
+    <TouchableOpacity 
+      style={styles.productItem}
+      onPress={() => navigation.navigate('ProductDetail', { product: item })}
+    >
       <Image source={{ uri: item.imageUrl }} style={styles.productImage} />
       
       <View style={styles.productInfo}>
@@ -239,7 +232,7 @@ const SearchScreen = () => {
             <Text style={styles.sectionTitle}>Có thể bạn sẽ thích</Text>
             
             <FlatList
-              data={products.filter(product => product.isFeatured).slice(0, 5)}
+              data={products.filter((product: Product) => product.isFeatured).slice(0, 5)}
               renderItem={renderSearchResultItem}
               keyExtractor={(item) => item.id}
               scrollEnabled={false}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -7,147 +7,192 @@ import {
   Dimensions,
   TouchableOpacity,
   Alert,
+  Image,
+  ScrollView,
 } from 'react-native';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { useAuth } from '../contexts/AuthContext';
-import { useOrders, Order as OrderType } from '../contexts/OrderContext';
+import { useOrders, Order } from '../contexts/OrderContext';
 
 type OrderStatus =
-  | 'Chờ xác nhận'
-  | 'Đang xử lý'
-  | 'Đang giao hàng'
-  | 'Đã giao'
-  | 'Đã hủy';
+  | 'pending'
+  | 'processing'
+  | 'shipping'
+  | 'delivered'
+  | 'cancelled';
 
 // Map API statuses to display statuses
-const statusMapping: { [key: string]: OrderStatus } = {
+const statusMapping: { [key: string]: string } = {
   'pending': 'Chờ xác nhận',
   'processing': 'Đang xử lý',
   'shipping': 'Đang giao hàng',
-  'delivered': 'Đã giao',
+  'delivered': 'Đã giao hàng',
   'cancelled': 'Đã hủy'
 };
 
-const statusFlow: { [key in OrderStatus]?: OrderStatus } = {
-  'Chờ xác nhận': 'Đang xử lý',
-  'Đang xử lý': 'Đang giao hàng',
-};
-
-const getStatusColor = (status: OrderStatus) => {
-  switch (status) {
-    case 'Đã giao':
+const getStatusColor = (status: string) => {
+  switch (status.toLowerCase()) {
+    case 'delivered':
       return { color: 'green' };
-    case 'Chờ xác nhận':
-    case 'Đang xử lý':
-    case 'Đang giao hàng':
+    case 'pending':
+    case 'processing':
+    case 'shipping':
       return { color: 'orange' };
-    case 'Đã hủy':
+    case 'cancelled':
       return { color: 'red' };
     default:
-      return {};
+      return { color: 'black' };
   }
+};
+
+const formatCurrency = (amount: number): string => {
+  return amount.toLocaleString('vi-VN') + ' đ';
+};
+
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('vi-VN', { 
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
 };
 
 
 
 // Define display order type for UI
-type DisplayOrder = {
-  id: string;
-  date: string;
-  status: OrderStatus;
-  total: string;
-};
-
-const OrderItem = ({ order, onAction }: { order: DisplayOrder; onAction: (id: string, action: string) => void }) => (
-  <View style={styles.card}>
-    <View style={styles.row}>
-      <Text style={styles.label}>Mã đơn:</Text>
-      <Text style={styles.value}>{order.id}</Text>
+const OrderItem = ({ order, onAction }: { order: Order; onAction: (id: string, action: string) => void }) => (
+  <View style={styles.orderCard}>
+    <View style={styles.orderHeader}>
+      <Text style={styles.orderId}>Đơn hàng #{order.id}</Text>
+      <View style={[styles.statusBadge, { backgroundColor: getStatusColor(order.status).color }]}>
+        <Text style={styles.statusText}>{statusMapping[order.status] || order.status}</Text>
+      </View>
     </View>
-    <View style={styles.row}>
-      <Text style={styles.label}>Ngày:</Text>
-      <Text style={styles.value}>{order.date}</Text>
+    
+    <Text style={styles.orderDate}>Ngày đặt: {formatDate(order.createdAt)}</Text>
+    
+    <View style={styles.itemsContainer}>
+      {order.products.map((product, index) => (
+        <View key={index} style={styles.productItem}>
+          <Image 
+            source={{ uri: product.imageUrl || 'https://via.placeholder.com/60' }} 
+            style={styles.productImage} 
+          />
+          <View style={styles.productInfo}>
+            <Text style={styles.productName}>{product.name}</Text>
+            <Text style={styles.productDetails}>
+              {product.color} - {product.size} | SL: {product.quantity}
+            </Text>
+            <Text style={styles.productPrice}>{formatCurrency(product.price)}</Text>
+          </View>
+        </View>
+      ))}
     </View>
-    <View style={styles.row}>
-      <Text style={styles.label}>Trạng thái:</Text>
-      <Text style={[styles.value, getStatusColor(order.status)]}>{order.status}</Text>
+    
+    <View style={styles.orderFooter}>
+      <Text style={styles.totalText}>
+        Tổng cộng: <Text style={styles.totalPrice}>{formatCurrency(order.total)}</Text>
+      </Text>
+      
+      {order.status === 'pending' && (
+        <TouchableOpacity
+          style={[styles.actionButton, styles.cancelButton]}
+          onPress={() => onAction(order.id, 'cancel')}
+        >
+          <Text style={styles.actionButtonText}>Hủy đơn</Text>
+        </TouchableOpacity>
+      )}
+      
+      {order.status === 'delivered' && (
+        <TouchableOpacity
+          style={[styles.actionButton, styles.reviewButton]}
+          onPress={() => onAction(order.id, 'review')}
+        >
+          <Text style={styles.actionButtonText}>Đánh giá</Text>
+        </TouchableOpacity>
+      )}
     </View>
-    <View style={styles.row}>
-      <Text style={styles.label}>Tổng:</Text>
-      <Text style={styles.value}>{order.total}</Text>
-    </View>
-
-    {/* Action buttons */}
-    {order.status === 'Chờ xác nhận' && (
-      <TouchableOpacity onPress={() => onAction(order.id, 'cancel')}>
-        <Text style={styles.action}>❌ Hủy đơn</Text>
-      </TouchableOpacity>
-    )}
-    {order.status === 'Đang giao hàng' && (
-      <TouchableOpacity onPress={() => onAction(order.id, 'received')}>
-        <Text style={styles.action}>✅ Đã nhận đơn hàng</Text>
-      </TouchableOpacity>
-    )}
   </View>
 );
 
 export default function OrderHistoryScreen() {
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    { key: 'ChoXacNhan', title: 'Chờ xác nhận' },
-    { key: 'DangXuLy', title: 'Đang xử lý' },
-    { key: 'DangGiaoHang', title: 'Đang giao hàng' },
-    { key: 'DaGiao', title: 'Đã giao' },
-    { key: 'DaHuy', title: 'Đã hủy' },
+    { key: 'All', title: 'Tất cả' },
+    { key: 'Pending', title: 'Chờ xác nhận' },
+    { key: 'Shipping', title: 'Đang giao' },
+    { key: 'Delivered', title: 'Đã giao' },
+    { key: 'Cancelled', title: 'Đã hủy' },
   ]);
 
   // Get orders from context
-  const { orders, updateOrderStatus } = useOrders();
+  const { getUserOrders, updateOrderStatus } = useOrders();
   const { currentUser } = useAuth();
 
-  // Transform API orders to display format
-  const displayOrders = useMemo<DisplayOrder[]>(() => {
+  // Get user orders
+  const userOrders = useMemo(() => {
     if (!currentUser) return [];
-    
-    return orders
-      .filter(order => order.userId === currentUser.email)
-      .map(order => ({
-        id: order.id,
-        date: new Date(order.createdAt).toLocaleDateString('vi-VN'),
-        status: statusMapping[order.status] || 'Chờ xác nhận' as OrderStatus,
-        total: order.total.toLocaleString('vi-VN') + ' đ'
-      }));
-  }, [orders, currentUser]);
+    return getUserOrders(currentUser.email);
+  }, [currentUser, getUserOrders]);
 
   const handleAction = (id: string, action: string) => {
     if (action === 'cancel') {
-      updateOrderStatus(id, 'cancelled');
-    } else if (action === 'received') {
-      updateOrderStatus(id, 'delivered');
+      Alert.alert(
+        'Hủy đơn hàng',
+        'Bạn có chắc muốn hủy đơn hàng này?',
+        [
+          { text: 'Không', style: 'cancel' },
+          { 
+            text: 'Có', 
+            onPress: () => updateOrderStatus(id, 'cancelled')
+          }
+        ]
+      );
+    } else if (action === 'review') {
+      Alert.alert('Đánh giá', `Đánh giá đơn hàng #${id}`);
     }
   };
 
   const renderScene = SceneMap({
-    ChoXacNhan: () => renderList('Chờ xác nhận'),
-    DangXuLy: () => renderList('Đang xử lý'),
-    DangGiaoHang: () => renderList('Đang giao hàng'),
-    DaGiao: () => renderList('Đã giao'),
-    DaHuy: () => renderList('Đã hủy'),
+    All: () => renderList(null),
+    Pending: () => renderList('pending'),
+    Shipping: () => renderList('shipping'),
+    Delivered: () => renderList('delivered'),
+    Cancelled: () => renderList('cancelled'),
   });
-  const renderList = (status: OrderStatus) => {
-    const filtered = displayOrders.filter((o) => o.status === status);
+  const renderList = (status: string | null) => {
+    const filtered = status
+      ? userOrders.filter((order) => order.status === status)
+      : userOrders;
+
     return (
-      <FlatList
-        data={filtered}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <OrderItem order={item} onAction={handleAction} />}
-        ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 20 }}>Không có đơn hàng</Text>}
-      />
+      <View style={styles.scene}>
+        {!currentUser ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>Vui lòng đăng nhập để xem đơn hàng</Text>
+          </View>
+        ) : filtered.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>
+              {status ? `Không có đơn hàng nào với trạng thái này` : 'Bạn chưa có đơn hàng nào'}
+            </Text>
+          </View>
+        ) : (
+          <FlatList
+            data={filtered}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => <OrderItem order={item} onAction={handleAction} />}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 20 }}
+          />
+        )}
+      </View>
     );
   };
 
   return (
-    <View style={{ flex: 1, paddingTop: 40 }}>
+    <View style={styles.container}>
       <Text style={styles.header}>🧾 Đơn mua</Text>
       <TabView
         navigationState={{ index, routes }}
@@ -157,12 +202,12 @@ export default function OrderHistoryScreen() {
         renderTabBar={(props) => (
           <TabBar
             {...props}
-            indicatorStyle={{ backgroundColor: '#000' }}
+            indicatorStyle={{ backgroundColor: '#E91E63' }}
             style={{ backgroundColor: '#fff' }}
-            activeColor="#000"
+            activeColor="#E91E63"
             inactiveColor="#888"
             scrollEnabled
-            tabStyle={{ width: 150 }}
+            tabStyle={{ width: 120 }}
           />
         )}
       />
@@ -171,12 +216,140 @@ export default function OrderHistoryScreen() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+    paddingTop: 40,
+  },
   header: {
     fontSize: 20,
     fontWeight: 'bold',
     marginLeft: 16,
     marginBottom: 10,
   },
+  scene: {
+    flex: 1,
+    padding: 10,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#888',
+    textAlign: 'center',
+  },
+  orderCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  orderHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  orderId: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  statusText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  orderDate: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 12,
+  },
+  itemsContainer: {
+    marginBottom: 12,
+  },
+  productItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  productImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    marginRight: 12,
+  },
+  productInfo: {
+    flex: 1,
+  },
+  productName: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#333',
+    marginBottom: 4,
+  },
+  productDetails: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 4,
+  },
+  productPrice: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#E91E63',
+  },
+  orderFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
+  },
+  totalText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  totalPrice: {
+    fontWeight: 'bold',
+    color: '#E91E63',
+    fontSize: 18,
+  },
+  actionButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    marginLeft: 8,
+  },
+  cancelButton: {
+    backgroundColor: '#FF5722',
+  },
+  reviewButton: {
+    backgroundColor: '#4CAF50',
+  },
+  actionButtonText: {
+    color: 'white',
+    fontWeight: '500',
+    fontSize: 12,
+  },
+  // Legacy styles to maintain compatibility
   card: {
     backgroundColor: '#fff',
     marginHorizontal: 16,

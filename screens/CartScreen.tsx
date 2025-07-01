@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { useCart } from '../contexts/CartContext';
-import { Product } from '../types/product';
+import { Product } from '../contexts/ProductContext';
 import { useNavigation, useRoute, CompositeNavigationProp, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
@@ -27,8 +27,7 @@ const CartScreen: React.FC = () => {
 
   const calculateSubtotal = () => {
     return cartItems.reduce((total, item) => {
-      const priceNumber = parseInt(item.price.replace(/\D/g, ''));
-      return total + priceNumber * item.quantity;
+      return total + item.price * item.quantity;
     }, 0);
   };
 
@@ -71,10 +70,10 @@ const CartScreen: React.FC = () => {
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <View style={styles.card}>
-                <Image source={item.image} style={styles.image} />
+                <Image source={{ uri: item.imageUrl }} style={styles.image} />
                 <View style={styles.infoContainer}>
                   <Text style={styles.name}>{item.name}</Text>
-                  <Text style={styles.price}>{item.price}</Text>
+                  <Text style={styles.price}>{item.price.toLocaleString('vi-VN')}₫</Text>
 
                   <View style={styles.quantityContainer}>
                     <TouchableOpacity onPress={() => decreaseQuantity(item.id)} style={styles.quantityButton}>

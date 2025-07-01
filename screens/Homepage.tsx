@@ -4,6 +4,8 @@ import { Product } from "../types/product";
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from "@react-navigation/native";
 import CardProduct from "../components/product/CardProduct";
+import { useProducts, Product as ProductType } from '../contexts/ProductContext';
+import { RootStackParamList } from '../types/navigation';
 
 import aoThun from '../assets/ao_thun.jpg';
 import aoThunTrang from '../assets/ao_thun_trang.jpg';
@@ -11,64 +13,6 @@ import quanJean from '../assets/quan_jean.jpg';
 import vay from '../assets/vay.jpg';
 import vest from '../assets/vest.jpg';
 import soMi from '../assets/somi.jpg';
-
-type RootStackParamList = {
-  Home: undefined;
-  ProductDetail: { product: Product };
-  Cart: undefined;
-  Profile: undefined;
-};
-
-const products: Product[] = [
-  {
-    id: '1',
-    name: 'Áo Thun',
-    price: '200,000₫',
-    image: aoThun,
-    describe:'áo thun đẹp',
-    sold:'30,0K'
-  },
-  {
-    id: '2',
-    name: 'Quần Jeans',
-    price: '450,000₫',
-    image: quanJean,
-    describe:'áo thun đẹp',
-    sold:'30,0K'
-  },
-  {
-    id: '3',
-    name: 'Váy Nữ',
-    price: '350,000₫',
-    image: vay,
-    describe:'áo thun đẹp',
-    sold:'30,0K'
-  },
-  {
-    id: '4',
-    name: 'Vest Nam',
-    price: '650,000₫',
-    image: vest,
-    describe:'áo thun đẹp',
-    sold:'30,0K'
-  },
-  {
-    id: '5',
-    name: 'Áo Sơ Mi',
-    price: '300,000₫',
-    image: soMi,
-    describe:'áo thun đẹp',
-    sold:'30,0K'
-  },
-  {
-    id: '6',
-    name: 'Áo Thun Trắng',
-    price: '200,000₫',
-    image: aoThunTrang,
-    describe:'áo thun đẹp',
-    sold:'30,0K'
-  },
-];
 
 const featuredCategories = [
   { id: '1', label: '👗 Váy', value: 'Váy Nữ', image: vay },
@@ -81,19 +25,31 @@ const Homepage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [priceFilter, setPriceFilter] = useState<string | null>(null);
+  
+  // Get products from context
+  const { products } = useProducts();
 
-  const filterPrice = (priceStr: string) => {
-    const priceNumber = parseInt(priceStr.replace(/\D/g, ''));
-    if (priceFilter === '<300') return priceNumber < 300000;
-    if (priceFilter === '>=300') return priceNumber >= 300000;
+  const filterPrice = (price: number) => {
+    if (priceFilter === '<300') return price < 300000;
+    if (priceFilter === '>=300') return price >= 300000;
     return true;
   };
 
-  const filteredProducts = products.filter(product =>
+  const filteredProducts = products.filter((product: ProductType) =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
     (selectedBrand ? product.name === selectedBrand : true) &&
     filterPrice(product.price)
   );
+
+  // Convert ProductType to Product for CardProduct component
+  const convertedProducts = filteredProducts.map((product: ProductType) => ({
+    id: product.id,
+    name: product.name,
+    price: `${product.price.toLocaleString('vi-VN')}₫`,
+    image: { uri: product.imageUrl },
+    describe: product.description,
+    sold: `${Math.floor(Math.random() * 50 + 10)}K`
+  }));
 
   const numColumns = 2;
 
@@ -173,17 +129,16 @@ const Homepage: React.FC = () => {
         </TouchableOpacity>
       </View> */}
 
-      {/* Danh sách sản phẩm */}
-      <FlatList
-  data={filteredProducts}
-  keyExtractor={(item) => item.id}
-  numColumns={2}
-  columnWrapperStyle={{ justifyContent: 'space-between' }}
-  contentContainerStyle={{ paddingBottom: 20 }}
-  renderItem={({ item }) => (
-    <CardProduct product={item}/>
-  )}
-/>
+      {/* Danh sách sản phẩm */}        <FlatList
+          data={convertedProducts}
+          keyExtractor={(item) => item.id}
+          numColumns={2}
+          columnWrapperStyle={{ justifyContent: 'space-between' }}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          renderItem={({ item }) => (
+            <CardProduct product={item}/>
+          )}
+        />
     </View>
   );
 };

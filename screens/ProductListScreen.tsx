@@ -83,7 +83,10 @@ const ProductListScreen = () => {
 
   // Render item trong danh sách sản phẩm
   const renderProductItem = ({ item }: { item: Product }) => (
-    <TouchableOpacity style={styles.productCard}>
+    <TouchableOpacity 
+      style={styles.productCard}
+      onPress={() => navigation.navigate('ProductDetail', { product: item })}
+    >
       <View style={styles.discountBadge}>
         <Text style={styles.discountText}>-20%</Text>
       </View>

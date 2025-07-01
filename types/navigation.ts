@@ -1,3 +1,5 @@
+import { Product } from '../contexts/ProductContext';
+
 export type RootStackParamList = {
   Tab: { screen: keyof BottomTabParamList } | undefined;
   AdminTab: undefined;
@@ -18,7 +20,7 @@ export type RootStackParamList = {
   HelpCenter: undefined;
   Tabs: undefined;
     
-  ProductDetail: undefined;
+  ProductDetail: { product: Product };
   Checkout: undefined;
   Login: undefined;
   Register: undefined;
