@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  FlatList, 
-  Image, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Image,
   TouchableOpacity,
   TextInput,
   ScrollView,
@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../App';
+import { RootStackParamList } from '../types/navigation';
 
 // Import dữ liệu mẫu
 import { products } from '../data/products';
@@ -49,7 +49,7 @@ const ProductListScreen = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [sortOption, setSortOption] = useState<string | null>(null);
   const [menuVisible, setMenuVisible] = useState(false);
-  
+
   // Xử lý tìm kiếm
   const handleSearch = (text: string) => {
     setSearchQuery(text);
@@ -68,20 +68,20 @@ const ProductListScreen = () => {
   // Lọc và sắp xếp sản phẩm
   const getFilteredProducts = () => {
     let filtered = [...products];
-    
+
     // Lọc theo tìm kiếm
     if (searchQuery) {
-      filtered = filtered.filter(product => 
+      filtered = filtered.filter(product =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.description.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-    
+
     // Lọc theo danh mục
     if (selectedCategory) {
       filtered = filtered.filter(product => product.category === selectedCategory);
     }
-    
+
     // Sắp xếp
     if (sortOption === 'price-asc') {
       filtered.sort((a, b) => a.price - b.price);
@@ -92,7 +92,7 @@ const ProductListScreen = () => {
     } else if (sortOption === 'rating') {
       filtered.sort((a, b) => b.rating - a.rating);
     }
-    
+
     return filtered;
   };
 
@@ -102,19 +102,19 @@ const ProductListScreen = () => {
       <View style={styles.discountBadge}>
         <Text style={styles.discountText}>-20%</Text>
       </View>
-      
+
       <Image source={{ uri: item.imageUrl }} style={styles.productImage} />
-      
+
       <View style={styles.productInfo}>
         <Text style={styles.productCategory}>{item.category}</Text>
         <Text numberOfLines={2} style={styles.productName}>{item.name}</Text>
-        
+
         <View style={styles.ratingContainer}>
           {[1, 2, 3, 4, 5].map(star => (
-            <Text 
-              key={star} 
+            <Text
+              key={star}
               style={[
-                styles.starIcon, 
+                styles.starIcon,
                 star <= Math.round(item.rating) ? styles.starFilled : styles.starEmpty
               ]}
             >
@@ -123,7 +123,7 @@ const ProductListScreen = () => {
           ))}
           <Text style={styles.ratingText}>({item.rating})</Text>
         </View>
-        
+
         <View style={styles.priceContainer}>
           <Text style={styles.currentPrice}>{item.price.toLocaleString('vi-VN')} đ</Text>
           <Text style={styles.originalPrice}>{(item.price * 1.2).toLocaleString('vi-VN')} đ</Text>
@@ -134,17 +134,17 @@ const ProductListScreen = () => {
 
   // Render item trong danh sách danh mục
   const renderCategoryItem = ({ item }: { item: Category }) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={[
-        styles.categoryItem, 
+        styles.categoryItem,
         selectedCategory === item.name && styles.selectedCategoryItem
       ]}
       onPress={() => handleCategoryFilter(item.name)}
     >
       <Image source={{ uri: item.imageUrl }} style={styles.categoryImage} />
-      <Text 
+      <Text
         style={[
-          styles.categoryName, 
+          styles.categoryName,
           selectedCategory === item.name && styles.selectedCategoryName
         ]}
       >
@@ -165,14 +165,14 @@ const ProductListScreen = () => {
           value={searchQuery}
           onChangeText={handleSearch}
         />
-        <TouchableOpacity 
-          style={styles.menuButton} 
+        <TouchableOpacity
+          style={styles.menuButton}
           onPress={() => setMenuVisible(true)}
         >
           <Text style={styles.menuButtonText}>Menu</Text>
         </TouchableOpacity>
       </View>
-      
+
       {/* Modal Menu Điều hướng */}
       <Modal
         visible={menuVisible}
@@ -183,7 +183,7 @@ const ProductListScreen = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Điều hướng ứng dụng</Text>
-              <TouchableOpacity 
+            <TouchableOpacity
               style={styles.navigationButton}
               onPress={() => {
                 navigation.navigate('ProductList');
@@ -192,8 +192,8 @@ const ProductListScreen = () => {
             >
               <Text style={styles.navigationButtonText}>Danh sách sản phẩm</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
+
+            <TouchableOpacity
               style={styles.navigationButton}
               onPress={() => {
                 navigation.navigate('Search');
@@ -202,8 +202,8 @@ const ProductListScreen = () => {
             >
               <Text style={styles.navigationButtonText}>Tìm kiếm</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
+
+            <TouchableOpacity
               style={styles.navigationButton}
               onPress={() => {
                 navigation.navigate('Address');
@@ -212,8 +212,8 @@ const ProductListScreen = () => {
             >
               <Text style={styles.navigationButtonText}>Quản lý địa chỉ</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
+
+            <TouchableOpacity
               style={styles.navigationButton}
               onPress={() => {
                 navigation.navigate('Notification');
@@ -222,8 +222,8 @@ const ProductListScreen = () => {
             >
               <Text style={styles.navigationButtonText}>Thông báo</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
+
+            <TouchableOpacity
               style={styles.navigationButton}
               onPress={() => {
                 navigation.navigate('ProductManagement');
@@ -232,8 +232,8 @@ const ProductListScreen = () => {
             >
               <Text style={styles.navigationButtonText}>Quản lý sản phẩm</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
+
+            <TouchableOpacity
               style={styles.navigationButton}
               onPress={() => {
                 navigation.navigate('OrderManagement');
@@ -242,8 +242,8 @@ const ProductListScreen = () => {
             >
               <Text style={styles.navigationButtonText}>Quản lý đơn hàng</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
+
+            <TouchableOpacity
               style={styles.navigationButton}
               onPress={() => {
                 navigation.navigate('CategoryManagement');
@@ -252,8 +252,8 @@ const ProductListScreen = () => {
             >
               <Text style={styles.navigationButtonText}>Quản lý danh mục</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
+
+            <TouchableOpacity
               style={styles.navigationButton}
               onPress={() => {
                 navigation.navigate('Analytics');
@@ -262,8 +262,8 @@ const ProductListScreen = () => {
             >
               <Text style={styles.navigationButtonText}>Thống kê</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
+
+            <TouchableOpacity
               style={[styles.navigationButton, styles.closeButton]}
               onPress={() => setMenuVisible(false)}
             >
@@ -272,7 +272,7 @@ const ProductListScreen = () => {
           </View>
         </View>
       </Modal>
-      
+
       {/* Danh sách danh mục */}
       <View style={styles.categoriesSection}>
         <Text style={styles.sectionTitle}>Danh mục</Text>
@@ -285,39 +285,39 @@ const ProductListScreen = () => {
           contentContainerStyle={styles.categoriesList}
         />
       </View>
-      
+
       {/* Bộ lọc */}
       <View style={styles.filterBar}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <TouchableOpacity 
-            style={[styles.filterButton, sortOption === 'newest' && styles.activeFilterButton]} 
+          <TouchableOpacity
+            style={[styles.filterButton, sortOption === 'newest' && styles.activeFilterButton]}
             onPress={() => handleSort('newest')}
           >
             <Text style={[styles.filterText, sortOption === 'newest' && styles.activeFilterText]}>
               Mới nhất
             </Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.filterButton, sortOption === 'rating' && styles.activeFilterButton]} 
+
+          <TouchableOpacity
+            style={[styles.filterButton, sortOption === 'rating' && styles.activeFilterButton]}
             onPress={() => handleSort('rating')}
           >
             <Text style={[styles.filterText, sortOption === 'rating' && styles.activeFilterText]}>
               Đánh giá cao
             </Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.filterButton, sortOption === 'price-asc' && styles.activeFilterButton]} 
+
+          <TouchableOpacity
+            style={[styles.filterButton, sortOption === 'price-asc' && styles.activeFilterButton]}
             onPress={() => handleSort('price-asc')}
           >
             <Text style={[styles.filterText, sortOption === 'price-asc' && styles.activeFilterText]}>
               Giá thấp → cao
             </Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.filterButton, sortOption === 'price-desc' && styles.activeFilterButton]} 
+
+          <TouchableOpacity
+            style={[styles.filterButton, sortOption === 'price-desc' && styles.activeFilterButton]}
             onPress={() => handleSort('price-desc')}
           >
             <Text style={[styles.filterText, sortOption === 'price-desc' && styles.activeFilterText]}>
@@ -326,7 +326,7 @@ const ProductListScreen = () => {
           </TouchableOpacity>
         </ScrollView>
       </View>
-      
+
       {/* Danh sách sản phẩm */}
       <View style={styles.productListContainer}>
         <View style={styles.productListHeader}>
@@ -335,7 +335,7 @@ const ProductListScreen = () => {
           </Text>
           <Text style={styles.resultCount}>{filteredProducts.length} kết quả</Text>
         </View>
-        
+
         <FlatList
           data={filteredProducts}
           renderItem={renderProductItem}
