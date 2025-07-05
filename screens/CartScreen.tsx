@@ -21,6 +21,11 @@ const CartScreen: React.FC = () => {
   const route = useRoute<CartScreenRouteProp>();
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
+  // Auto-select all items when cartItems change
+  useEffect(() => {
+    setSelectedItems(cartItems.map(item => item.id));
+  }, [cartItems]);
+
   useEffect(() => {
     if (route.params?.selectedCoupon) {
       setCoupon(route.params.selectedCoupon);
@@ -108,7 +113,7 @@ const CartScreen: React.FC = () => {
         >
           <Text style={styles.checkoutButtonText}>Nhập Mã Giảm Giá</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
+        <TouchableOpacity style={[styles.checkoutButton, selectedItems.length === 0 && { opacity: 0.5 }]} onPress={handleCheckout} disabled={selectedItems.length === 0}>
           <Text style={styles.checkoutButtonText}>Thanh Toán</Text>
         </TouchableOpacity>
       </View>
