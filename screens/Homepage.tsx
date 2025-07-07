@@ -1,210 +1,186 @@
-  import React, { useState } from "react";
-  import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, TextInput } from "react-native";
-  import { Product } from "../types/product";
-  import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-  import { useNavigation } from "@react-navigation/native";
-  import CardProduct from "../components/product/CardProduct";
-  import Header from "../components/Header";
+import React, { useState } from "react";
+import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { Product } from "../types/product";
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from "@react-navigation/native";
+import CardProduct from "../components/product/CardProduct";
+import Header from "../components/Header";
+import { useProducts } from "../contexts/ProductContext";
+import { useAuth } from "../contexts/AuthContext";
 
-  import aoThun from '../assets/ao_thun.jpg';
-  import aoThunTrang from '../assets/ao_thun_trang.jpg';
-  import quanJean from '../assets/quan_jean.jpg';
-  import vay from '../assets/vay.jpg';
-  import vest from '../assets/vest.jpg';
-  import soMi from '../assets/somi.jpg';
+type RootStackParamList = {
+  Home: undefined;
+  ProductDetail: { product: Product };
+  Cart: undefined;
+  Profile: undefined;
+  Login: undefined;
+  Register: undefined;
+};
 
-  type RootStackParamList = {
-    Home: undefined;
-    ProductDetail: { product: Product };
-    Cart: undefined;
-    Profile: undefined;
+const Homepage: React.FC = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { products, getFeaturedProducts } = useProducts();
+  const { currentUser } = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [priceFilter, setPriceFilter] = useState<string | null>(null);
+
+  // Debug logs
+  console.log('Homepage - Total products:', products.length);
+  console.log('Homepage - First few products:', products.slice(0, 3));
+
+  // Get featured categories from products
+  const getUniqueCategories = () => {
+    const categories = [...new Set(products.map(p => p.category))];
+    return categories.slice(0, 6); // Take first 6 categories
   };
 
-  const products: Product[] = [
-    {
-      id: '1',
-      name: 'Áo Thun',
-      price: '200,000₫',
-      image: aoThun,
-      describe:'áo thun đẹp',
-      sold:'30,0K'
-    },
-    {
-      id: '2',
-      name: 'Quần Jeans',
-      price: '450,000₫',
-      image: quanJean,
-      describe:'áo thun đẹp',
-      sold:'30,0K'
-    },
-    {
-      id: '3',
-      name: 'Váy Nữ',
-      price: '350,000₫',
-      image: vay,
-      describe:'áo thun đẹp',
-      sold:'30,0K'
-    },
-    {
-      id: '4',
-      name: 'Vest Nam',
-      price: '650,000₫',
-      image: vest,
-      describe:'áo thun đẹp',
-      sold:'30,0K'
-    },
-    {
-      id: '5',
-      name: 'Áo Sơ Mi',
-      price: '300,000₫',
-      image: soMi,
-      describe:'áo thun đẹp',
-      sold:'30,0K'
-    },
-    {
-      id: '6',
-      name: 'Áo Thun Trắng',
-      price: '200,000₫',
-      image: aoThunTrang,
-      describe:'áo thun đẹp',
-      sold:'30,0K'
-    },
-  ];
+  const filterPrice = (price: number) => {
+    if (priceFilter === '<300') return price < 300000;
+    if (priceFilter === '>=300') return price >= 300000;
+    return true;
+  };
 
-  const featuredCategories = [
-    { id: '1', label: '👗 Váy', value: 'Váy Nữ', image: vay },
-    { id: '2', label: '🤵 Vest', value: 'Vest Nam',image:vest },
-    { id: '3', label: '👔 Sơ Mi', value: 'Áo Sơ Mi',image: soMi },
-  ];
+  const filteredProducts = products.filter(product =>
+    product.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+    (selectedCategory ? product.category === selectedCategory : true) &&
+    filterPrice(product.price)
+  );
 
-  const Homepage: React.FC = () => {
-    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-    const [searchQuery, setSearchQuery] = useState('');
-    const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
-    const [priceFilter, setPriceFilter] = useState<string | null>(null);
+  // Convert Product from context to old Product format for CardProduct
+  const convertProduct = (product: any) => ({
+    id: product.id,
+    name: product.name,
+    price: `${product.price.toLocaleString()}₫`,
+    image: { uri: product.imageUrl },
+    describe: product.description,
+    sold: `${Math.floor(Math.random() * 50)}K` // Random sold count
+  });
 
-    const filterPrice = (priceStr: string) => {
-      const priceNumber = parseInt(priceStr.replace(/\D/g, ''));
-      if (priceFilter === '<300') return priceNumber < 300000;
-      if (priceFilter === '>=300') return priceNumber >= 300000;
-      return true;
-    };
+  return (
+    <View style={styles.container}>
+      <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
-    const filteredProducts = products.filter(product =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      (selectedBrand ? product.name === selectedBrand : true) &&
-      filterPrice(product.price)
-    );
-
-    const numColumns = 2;
-
-    return (
-      <View style={styles.container}>
-        <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-        {/* Danh mục */}
-        <View style={styles.categoryContainer}>
-    <Text style={styles.filterTitle}>Các sản phẩm nổi bật:</Text>
-    <FlatList
-      data={featuredCategories}
-      horizontal
-      keyExtractor={(item) => item.id}
-      renderItem={({ item }) => (
-        <TouchableOpacity
-          style={styles.categoryItem}
-          onPress={() => setSelectedBrand(item.value)}
-        >
-          <Image source={item.image} style={styles.categoryImage} />
-        </TouchableOpacity>
+      {/* Login Banner for Guests */}
+      {!currentUser && (
+        <View style={styles.loginBanner}>
+          <View style={styles.loginBannerContent}>
+            <Text style={styles.loginBannerTitle}>Đăng nhập để mua hàng</Text>
+            <Text style={styles.loginBannerSubtitle}>Truy cập đầy đủ tính năng và ưu đãi</Text>
+            <View style={styles.loginBannerButtons}>
+              <TouchableOpacity
+                style={styles.loginButton}
+                onPress={() => navigation.navigate('Login')}
+              >
+                <Text style={styles.loginButtonText}>Đăng nhập</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.registerButton}
+                onPress={() => navigation.navigate('Register')}
+              >
+                <Text style={styles.registerButtonText}>Đăng ký</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
       )}
-      showsHorizontalScrollIndicator={false}
-    />
-  </View>
 
-        {/* Bộ lọc Type */}
-        <View style={styles.filterContainer}>
-          <Text style={styles.filterTitle}>Type:</Text>
-          <TouchableOpacity style={styles.filterButton} onPress={() => setSelectedBrand(null)}>
-            <Text>Tất cả</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.filterButton} onPress={() => setSelectedBrand('Áo Thun')}>
-            <Text>Áo Thun</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.filterButton} onPress={() => setSelectedBrand('Quần Jeans')}>
-            <Text>Quần Jeans</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Bộ lọc Giá */}
-        <View style={styles.filterContainer}>
-          <Text style={styles.filterTitle}>Giá:</Text>
-          <TouchableOpacity style={styles.filterButton} onPress={() => setPriceFilter(null)}>
-            <Text>Tất cả</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.filterButton} onPress={() => setPriceFilter('<300')}>
-            <Text>{'< 300K'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.filterButton} onPress={() => setPriceFilter('>=300')}>
-            <Text>{'>= 300K'}</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Giỏ hàng */}
-        {/* <View style={styles.functionsContainer}>
-          <TouchableOpacity style={styles.functionButton} onPress={() => navigation.navigate('Cart')}>
-            <Text style={styles.functionIcon}>🛒</Text>
-          </TouchableOpacity>
-        </View> */}
-
-        {/* Danh sách sản phẩm */}
+      {/* Featured Categories */}
+      <View style={styles.categoryContainer}>
+        <Text style={styles.filterTitle}>Danh mục nổi bật:</Text>
         <FlatList
-    data={filteredProducts}
-    keyExtractor={(item) => item.id}
-    numColumns={2}
-    columnWrapperStyle={{ justifyContent: 'space-between' }}
-    contentContainerStyle={{ paddingBottom: 20 }}
-    renderItem={({ item }) => (
-      <CardProduct product={item}/>
-    )}
-  />
+          data={getUniqueCategories()}
+          horizontal
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => {
+            const categoryProduct = products.find(p => p.category === item);
+            return (
+              <TouchableOpacity
+                style={styles.categoryItem}
+                onPress={() => setSelectedCategory(selectedCategory === item ? null : item)}
+              >
+                {categoryProduct && (
+                  <Image source={{ uri: categoryProduct.imageUrl }} style={styles.categoryImage} />
+                )}
+                <Text style={styles.categoryText}>{item}</Text>
+              </TouchableOpacity>
+            );
+          }}
+          showsHorizontalScrollIndicator={false}
+        />
       </View>
-    );
-  };
 
-  const styles = StyleSheet.create({
-    container: { flex: 1, padding: 10, backgroundColor: '#f5f5f5' },
+      {/* Category Filter */}
+      <View style={styles.filterContainer}>
+        <Text style={styles.filterTitle}>Danh mục:</Text>
+        <TouchableOpacity
+          style={[styles.filterButton, !selectedCategory && styles.activeFilter]}
+          onPress={() => setSelectedCategory(null)}
+        >
+          <Text>Tất cả</Text>
+        </TouchableOpacity>
+        {getUniqueCategories().slice(0, 3).map(category => (
+          <TouchableOpacity
+            key={category}
+            style={[styles.filterButton, selectedCategory === category && styles.activeFilter]}
+            onPress={() => setSelectedCategory(selectedCategory === category ? null : category)}
+          >
+            <Text>{category}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
-    headerContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: '#90D7FF',
-      borderRadius: 10,
-      padding: 8,
-      elevation: 3,
-      marginBottom: 10,
-    },
-    logo: { width: 50, height: 50, marginRight: 8 },
-    searchInput: {
-      flex: 1,
-      height: 35,
-      borderColor: '#ddd',
-      borderWidth: 1,
-      borderRadius: 20,
-      paddingHorizontal: 10,
-      backgroundColor: '#f0f0f0',
-    },
+      {/* Price Filter */}
+      <View style={styles.filterContainer}>
+        <Text style={styles.filterTitle}>Giá:</Text>
+        <TouchableOpacity
+          style={[styles.filterButton, !priceFilter && styles.activeFilter]}
+          onPress={() => setPriceFilter(null)}
+        >
+          <Text>Tất cả</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.filterButton, priceFilter === '<300' && styles.activeFilter]}
+          onPress={() => setPriceFilter(priceFilter === '<300' ? null : '<300')}
+        >
+          <Text>{'< 300K'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.filterButton, priceFilter === '>=300' && styles.activeFilter]}
+          onPress={() => setPriceFilter(priceFilter === '>=300' ? null : '>=300')}
+        >
+          <Text>{'>= 300K'}</Text>
+        </TouchableOpacity>
+      </View>
 
-    bannerContainer: {
-      width: '100%',
-      height: 150,
-      marginBottom: 10,
-    },
-    bannerImage: {
-      width: '100%',
-      height: '100%',
-      borderRadius: 10,
-    },
+      {/* Products List */}
+      <FlatList
+        data={filteredProducts}
+        keyExtractor={(item) => item.id}
+        numColumns={2}
+        columnWrapperStyle={{ justifyContent: 'space-between' }}
+        contentContainerStyle={{ paddingBottom: 20 }}
+        renderItem={({ item }) => (
+          <CardProduct product={convertProduct(item)} />
+        )}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>Không tìm thấy sản phẩm nào</Text>
+          </View>
+        }
+      />
+    </View>
+  );
+};
 
-    categoryContainer: {
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 10,
+    backgroundColor: '#f5f5f5'
+  },
+
+  categoryContainer: {
     marginBottom: 10,
   },
 
@@ -216,114 +192,113 @@
     padding: 10,
     borderRadius: 10,
     elevation: 2,
-    width: 80,  // Kích thước cố định cho item
-    height: 100, // Để ảnh + text nằm gọn trong
+    width: 80,
+    height: 100,
   },
 
   categoryImage: {
     width: 50,
     height: 50,
-    borderRadius: 25, // bo tròn hình ảnh
-    marginBottom: 5,
-  },
-  card: {
-    backgroundColor: '#fff',
-    flex: 1,
-    margin: 5,
-    padding: 8,
-    borderRadius: 10,
-    elevation: 3,
-    position: 'relative',
-  },
-
-  productImage: {
-    width: '100%',
-    height: 120,
-    borderRadius: 10,
+    borderRadius: 25,
     marginBottom: 5,
   },
 
-  badgeContainer: {
-    position: 'absolute',
-    top: 8,
-    left: 8,
-    backgroundColor: 'orange',
-    paddingHorizontal: 5,
-    paddingVertical: 2,
-    borderRadius: 3,
-  },
-
-  badgeText: {
+  categoryText: {
     fontSize: 10,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#333',
+  },
+
+  filterContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    flexWrap: 'wrap',
+  },
+
+  filterTitle: {
+    fontWeight: 'bold',
+    marginRight: 5
+  },
+
+  filterButton: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 15,
+    marginHorizontal: 3,
+    marginVertical: 2,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+
+  activeFilter: {
+    backgroundColor: '#90D7FF',
+    borderColor: '#90D7FF',
+  },
+
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 50,
+  },
+
+  emptyText: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+  },
+  loginBanner: {
+    backgroundColor: '#007bff',
+    marginBottom: 15,
+    borderRadius: 10,
+    padding: 15,
+  },
+  loginBannerContent: {
+    alignItems: 'center',
+  },
+  loginBannerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 5,
+  },
+  loginBannerSubtitle: {
+    fontSize: 14,
+    color: '#e3f2fd',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  loginBannerButtons: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  loginButton: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
+  loginButtonText: {
+    color: '#007bff',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  registerButton: {
+    backgroundColor: 'transparent',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#fff',
+  },
+  registerButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-  },
-
-  productName: {
     fontSize: 14,
-    fontWeight: 'bold',
-    color: '#333',
-    marginVertical: 2,
   },
+});
 
-  productPrice: {
-    fontSize: 14,
-    color: 'red',
-    fontWeight: 'bold',
-  },
-
-  productDescribe: {
-    fontSize: 12,
-    color: '#555',
-  },
-
-  productSold: {
-    fontSize: 12,
-    color: '#999',
-    marginTop: 2,
-  },
-
-    filterContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 8,
-      flexWrap: 'wrap',
-    },
-    filterTitle: { fontWeight: 'bold', marginRight: 5 },
-    filterButton: {
-      backgroundColor: '#fff',
-      paddingHorizontal: 10,
-      paddingVertical: 5,
-      borderRadius: 15,
-      marginHorizontal: 3,
-      marginVertical: 2,
-      borderWidth: 1,
-      borderColor: '#ddd',
-    },
-
-    functionsContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-around',
-      marginVertical: 10,
-    },
-    functionButton: {
-      backgroundColor: '#fff',
-      flex: 1,
-      marginHorizontal: 5,
-      paddingVertical: 10,
-      borderRadius: 10,
-      alignItems: 'center',
-      elevation: 2,
-    },
-    functionIcon: { fontSize: 24 },
-
-
-    profileIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginLeft: 8,
-  },
-  });
-
-  export default Homepage;
+export default Homepage;

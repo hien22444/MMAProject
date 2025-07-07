@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -8,224 +8,305 @@ import {
   Dimensions
 } from 'react-native';
 
-// Dữ liệu mẫu thống kê
-const analyticsData = {
-  revenue: {
-    total: 125700000,
-    lastMonth: 32500000,
-    thisMonth: 28400000,
-    percentChange: -12.6
-  },
-  orders: {
-    total: 852,
-    lastMonth: 215,
-    thisMonth: 188,
-    percentChange: -12.5
-  },
-  customers: {
-    total: 375,
-    lastMonth: 42,
-    thisMonth: 56,
-    percentChange: 33.3
-  },
-  products: {
-    total: 128,
-    bestsellers: [
-      { id: '1', name: 'Áo Thun Unisex Basic', sold: 86 },
-      { id: '2', name: 'Quần Jean Nam Slim Fit', sold: 72 },
-      { id: '3', name: 'Váy Liền Nữ Dáng Xòe', sold: 65 }
-    ]
-  }
-};
-
-// Dữ liệu mẫu cho biểu đồ doanh thu
-const revenueChartData = [
-  { month: 'T1', value: 18500000 },
-  { month: 'T2', value: 22300000 },
-  { month: 'T3', value: 21800000 },
-  { month: 'T4', value: 25600000 },
-  { month: 'T5', value: 32500000 },
-  { month: 'T6', value: 28400000 },
-];
-
-// Tìm giá trị lớn nhất để tỷ lệ biểu đồ
-const maxValue = Math.max(...revenueChartData.map(item => item.value));
+// Import contexts
+import { useProducts } from '../contexts/ProductContext';
+import { useOrders } from '../contexts/OrderContext';
 
 const AnalyticsScreen = () => {
-  const [activeTab, setActiveTab] = useState('overview');
-  const screenWidth = Dimensions.get('window').width;
+  const { products } = useProducts();
+  const { orders } = useOrders();
+  const [selectedTab, setSelectedTab] = useState('overview');
+  const [analyticsData, setAnalyticsData] = useState({
+    revenue: {
+      total: 0,
+      lastMonth: 0,
+      thisMonth: 0,
+      percentChange: 0
+    },
+    orders: {
+      total: 0,
+      lastMonth: 0,
+      thisMonth: 0,
+      percentChange: 0
+    },
+    customers: {
+      total: 0,
+      lastMonth: 0,
+      thisMonth: 0,
+      percentChange: 0
+    },
+    products: {
+      total: 0,
+      bestsellers: [] as any[]
+    }
+  });
 
-  const formatCurrency = (amount: number): string => {
-    return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " ₫";
+  // Generate analytics from real data
+  useEffect(() => {
+    const now = new Date();
+    const thisMonth = now.getMonth();
+    const lastMonth = thisMonth === 0 ? 11 : thisMonth - 1;
+    const thisYear = now.getFullYear();
+
+    // Calculate revenue
+    const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
+    const thisMonthOrders = orders.filter(order => {
+      const orderDate = new Date(order.createdAt);
+      return orderDate.getMonth() === thisMonth && orderDate.getFullYear() === thisYear;
+    });
+    const lastMonthOrders = orders.filter(order => {
+      const orderDate = new Date(order.createdAt);
+      return orderDate.getMonth() === lastMonth && orderDate.getFullYear() === thisYear;
+    });
+
+    const thisMonthRevenue = thisMonthOrders.reduce((sum, order) => sum + order.total, 0);
+    const lastMonthRevenue = lastMonthOrders.reduce((sum, order) => sum + order.total, 0);
+    const revenueChange = lastMonthRevenue > 0 ? ((thisMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100 : 0;
+
+    // Calculate customers
+    const uniqueCustomers = new Set(orders.map(order => order.userId)).size;
+    const thisMonthCustomers = new Set(thisMonthOrders.map(order => order.userId)).size;
+    const lastMonthCustomers = new Set(lastMonthOrders.map(order => order.userId)).size;
+    const customerChange = lastMonthCustomers > 0 ? ((thisMonthCustomers - lastMonthCustomers) / lastMonthCustomers) * 100 : 0;
+
+    // Calculate bestsellers
+    const productSales = new Map<string, { name: string; sold: number }>();
+    orders.forEach(order => {
+      order.products.forEach(product => {
+        if (productSales.has(product.id)) {
+          const existing = productSales.get(product.id)!;
+          productSales.set(product.id, {
+            name: existing.name,
+            sold: existing.sold + product.quantity
+          });
+        } else {
+          productSales.set(product.id, {
+            name: product.name,
+            sold: product.quantity
+          });
+        }
+      });
+    });
+
+    const bestsellers = Array.from(productSales.entries())
+      .map(([id, data]) => ({ id, name: data.name, sold: data.sold }))
+      .sort((a, b) => b.sold - a.sold)
+      .slice(0, 5);
+
+    setAnalyticsData({
+      revenue: {
+        total: totalRevenue,
+        lastMonth: lastMonthRevenue,
+        thisMonth: thisMonthRevenue,
+        percentChange: revenueChange
+      },
+      orders: {
+        total: orders.length,
+        lastMonth: lastMonthOrders.length,
+        thisMonth: thisMonthOrders.length,
+        percentChange: lastMonthOrders.length > 0 ? ((thisMonthOrders.length - lastMonthOrders.length) / lastMonthOrders.length) * 100 : 0
+      },
+      customers: {
+        total: uniqueCustomers,
+        lastMonth: lastMonthCustomers,
+        thisMonth: thisMonthCustomers,
+        percentChange: customerChange
+      },
+      products: {
+        total: products.length,
+        bestsellers
+      }
+    });
+  }, [products, orders]);
+
+  // Dữ liệu mẫu cho biểu đồ doanh thu (có thể tính từ orders thực tế)
+  const revenueChartData = [
+    { month: 'T1', value: 18500000 },
+    { month: 'T2', value: 22300000 },
+    { month: 'T3', value: 21800000 },
+    { month: 'T4', value: 25600000 },
+    { month: 'T5', value: 32500000 },
+    { month: 'T6', value: 28400000 },
+  ];
+
+  // Lấy chiều rộng màn hình
+  const { width } = Dimensions.get('window');
+  const chartWidth = width - 40;
+  const maxValue = Math.max(...revenueChartData.map(item => item.value));
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(amount);
   };
 
-  const renderStatusIndicator = (percentChange: number) => {
-    const isPositive = percentChange > 0;
-    return (
-      <View style={[styles.statusIndicator, isPositive ? styles.positive : styles.negative]}>
-        <Text style={styles.statusText}>
-          {isPositive ? '+' : ''}{percentChange}%
-        </Text>
-      </View>
-    );
-  };
-
-  const renderOverviewTab = () => {
-    return (
-      <View style={styles.tabContent}>
-        {/* Thống kê tổng quan */}
-        <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
-            <Text style={styles.statTitle}>Doanh thu</Text>
-            <Text style={styles.statValue}>{formatCurrency(analyticsData.revenue.thisMonth)}</Text>
-            <View style={styles.statFooter}>
-              <Text style={styles.statLabel}>Tháng này</Text>
-              {renderStatusIndicator(analyticsData.revenue.percentChange)}
-            </View>
-          </View>
-
-          <View style={styles.statCard}>
-            <Text style={styles.statTitle}>Đơn hàng</Text>
-            <Text style={styles.statValue}>{analyticsData.orders.thisMonth}</Text>
-            <View style={styles.statFooter}>
-              <Text style={styles.statLabel}>Tháng này</Text>
-              {renderStatusIndicator(analyticsData.orders.percentChange)}
-            </View>
-          </View>
-
-          <View style={styles.statCard}>
-            <Text style={styles.statTitle}>Khách hàng mới</Text>
-            <Text style={styles.statValue}>{analyticsData.customers.thisMonth}</Text>
-            <View style={styles.statFooter}>
-              <Text style={styles.statLabel}>Tháng này</Text>
-              {renderStatusIndicator(analyticsData.customers.percentChange)}
-            </View>
-          </View>
-        </View>
-
-        {/* Biểu đồ doanh thu */}
-        <View style={styles.chartContainer}>
-          <Text style={styles.chartTitle}>Doanh thu 6 tháng gần đây</Text>
-          <View style={styles.chart}>
-            {revenueChartData.map((item, index) => {
-              const barHeight = (item.value / maxValue) * 200;
-              return (
-                <View key={index} style={styles.barContainer}>
-                  <View style={[styles.bar, { height: barHeight }]} />
-                  <Text style={styles.barLabel}>{item.month}</Text>
-                </View>
-              );
-            })}
-          </View>
-        </View>
-
-        {/* Top sản phẩm bán chạy */}
-        <View style={styles.bestsellersContainer}>
-          <Text style={styles.sectionTitle}>Sản phẩm bán chạy</Text>
-          {analyticsData.products.bestsellers.map((product, index) => (
-            <View key={product.id} style={styles.productRow}>
-              <Text style={styles.productRank}>#{index + 1}</Text>
-              <Text style={styles.productName}>{product.name}</Text>
-              <Text style={styles.productSold}>{product.sold} đã bán</Text>
-            </View>
-          ))}
-        </View>
-      </View>
-    );
-  };
-
-  const renderSalesTab = () => {
-    return (
-      <View style={styles.tabContent}>
-        <Text style={styles.sectionTitle}>Chi tiết doanh thu</Text>
-        <View style={styles.detailCard}>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Tổng doanh thu:</Text>
-            <Text style={styles.detailValue}>{formatCurrency(analyticsData.revenue.total)}</Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Tháng trước:</Text>
-            <Text style={styles.detailValue}>{formatCurrency(analyticsData.revenue.lastMonth)}</Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Tháng này:</Text>
-            <Text style={styles.detailValue}>{formatCurrency(analyticsData.revenue.thisMonth)}</Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Tăng trưởng:</Text>
-            <View style={styles.detailValueContainer}>
-              <Text style={styles.detailValue}>{analyticsData.revenue.percentChange}%</Text>
-              {renderStatusIndicator(analyticsData.revenue.percentChange)}
-            </View>
-          </View>
-        </View>
-      </View>
-    );
-  };
-
-  const renderOrdersTab = () => {
-    return (
-      <View style={styles.tabContent}>
-        <Text style={styles.sectionTitle}>Chi tiết đơn hàng</Text>
-        <View style={styles.detailCard}>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Tổng đơn hàng:</Text>
-            <Text style={styles.detailValue}>{analyticsData.orders.total}</Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Tháng trước:</Text>
-            <Text style={styles.detailValue}>{analyticsData.orders.lastMonth}</Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Tháng này:</Text>
-            <Text style={styles.detailValue}>{analyticsData.orders.thisMonth}</Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Tăng trưởng:</Text>
-            <View style={styles.detailValueContainer}>
-              <Text style={styles.detailValue}>{analyticsData.orders.percentChange}%</Text>
-              {renderStatusIndicator(analyticsData.orders.percentChange)}
-            </View>
-          </View>
-        </View>
-      </View>
-    );
+  const formatPercent = (percent: number) => {
+    return `${percent >= 0 ? '+' : ''}${percent.toFixed(1)}%`;
   };
 
   return (
     <ScrollView style={styles.container}>
-      {/* Tab Navigation */}
-      <View style={styles.tabBar}>
-        <TouchableOpacity
-          style={[styles.tabButton, activeTab === 'overview' && styles.activeTabButton]}
-          onPress={() => setActiveTab('overview')}
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Thống kê & Phân tích</Text>
+        <Text style={styles.headerSubtitle}>Báo cáo kinh doanh tháng {new Date().getMonth() + 1}</Text>
+      </View>
+
+      {/* Tab selector */}
+      <View style={styles.tabContainer}>
+        <TouchableOpacity 
+          style={[styles.tab, selectedTab === 'overview' && styles.activeTab]}
+          onPress={() => setSelectedTab('overview')}
         >
-          <Text style={[styles.tabButtonText, activeTab === 'overview' && styles.activeTabButtonText]}>
+          <Text style={[styles.tabText, selectedTab === 'overview' && styles.activeTabText]}>
             Tổng quan
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tabButton, activeTab === 'sales' && styles.activeTabButton]}
-          onPress={() => setActiveTab('sales')}
+        <TouchableOpacity 
+          style={[styles.tab, selectedTab === 'revenue' && styles.activeTab]}
+          onPress={() => setSelectedTab('revenue')}
         >
-          <Text style={[styles.tabButtonText, activeTab === 'sales' && styles.activeTabButtonText]}>
+          <Text style={[styles.tabText, selectedTab === 'revenue' && styles.activeTabText]}>
             Doanh thu
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tabButton, activeTab === 'orders' && styles.activeTabButton]}
-          onPress={() => setActiveTab('orders')}
+        <TouchableOpacity 
+          style={[styles.tab, selectedTab === 'products' && styles.activeTab]}
+          onPress={() => setSelectedTab('products')}
         >
-          <Text style={[styles.tabButtonText, activeTab === 'orders' && styles.activeTabButtonText]}>
-            Đơn hàng
+          <Text style={[styles.tabText, selectedTab === 'products' && styles.activeTabText]}>
+            Sản phẩm
           </Text>
         </TouchableOpacity>
       </View>
 
-      {/* Tab Content */}
-      {activeTab === 'overview' && renderOverviewTab()}
-      {activeTab === 'sales' && renderSalesTab()}
-      {activeTab === 'orders' && renderOrdersTab()}
+      {/* Overview Tab */}
+      {selectedTab === 'overview' && (
+        <View style={styles.content}>
+          {/* KPI Cards */}
+          <View style={styles.cardRow}>
+            <View style={styles.kpiCard}>
+              <Text style={styles.kpiTitle}>Tổng doanh thu</Text>
+              <Text style={styles.kpiValue}>{formatCurrency(analyticsData.revenue.total)}</Text>
+              <Text style={[styles.kpiChange, analyticsData.revenue.percentChange >= 0 ? styles.positive : styles.negative]}>
+                {formatPercent(analyticsData.revenue.percentChange)} so với tháng trước
+              </Text>
+            </View>
+            <View style={styles.kpiCard}>
+              <Text style={styles.kpiTitle}>Tổng đơn hàng</Text>
+              <Text style={styles.kpiValue}>{analyticsData.orders.total}</Text>
+              <Text style={[styles.kpiChange, analyticsData.orders.percentChange >= 0 ? styles.positive : styles.negative]}>
+                {formatPercent(analyticsData.orders.percentChange)} so với tháng trước
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.cardRow}>
+            <View style={styles.kpiCard}>
+              <Text style={styles.kpiTitle}>Khách hàng</Text>
+              <Text style={styles.kpiValue}>{analyticsData.customers.total}</Text>
+              <Text style={[styles.kpiChange, analyticsData.customers.percentChange >= 0 ? styles.positive : styles.negative]}>
+                {formatPercent(analyticsData.customers.percentChange)} so với tháng trước
+              </Text>
+            </View>
+            <View style={styles.kpiCard}>
+              <Text style={styles.kpiTitle}>Sản phẩm</Text>
+              <Text style={styles.kpiValue}>{analyticsData.products.total}</Text>
+              <Text style={styles.kpiChange}>Tổng số sản phẩm</Text>
+            </View>
+          </View>
+
+          {/* Best Sellers */}
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionTitle}>Sản phẩm bán chạy</Text>
+            {analyticsData.products.bestsellers.map((product, index) => (
+              <View key={product.id} style={styles.bestsellerRow}>
+                <View style={styles.bestsellerRank}>
+                  <Text style={styles.rankText}>{index + 1}</Text>
+                </View>
+                <View style={styles.bestsellerInfo}>
+                  <Text style={styles.bestsellerName}>{product.name}</Text>
+                  <Text style={styles.bestsellerSold}>{product.sold} đã bán</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        </View>
+      )}
+
+      {/* Revenue Tab */}
+      {selectedTab === 'revenue' && (
+        <View style={styles.content}>
+          <View style={styles.chartCard}>
+            <Text style={styles.chartTitle}>Biểu đồ doanh thu 6 tháng gần đây</Text>
+            <View style={styles.chart}>
+              {revenueChartData.map((item, index) => (
+                <View key={index} style={styles.chartColumn}>
+                  <View 
+                    style={[
+                      styles.chartBar, 
+                      { height: (item.value / maxValue) * 200 }
+                    ]} 
+                  />
+                  <Text style={styles.chartLabel}>{item.month}</Text>
+                  <Text style={styles.chartValue}>
+                    {(item.value / 1000000).toFixed(1)}M
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </View>
+
+          <View style={styles.revenueDetailCard}>
+            <Text style={styles.sectionTitle}>Chi tiết doanh thu</Text>
+            <View style={styles.revenueRow}>
+              <Text style={styles.revenueLabel}>Tháng này:</Text>
+              <Text style={styles.revenueValue}>{formatCurrency(analyticsData.revenue.thisMonth)}</Text>
+            </View>
+            <View style={styles.revenueRow}>
+              <Text style={styles.revenueLabel}>Tháng trước:</Text>
+              <Text style={styles.revenueValue}>{formatCurrency(analyticsData.revenue.lastMonth)}</Text>
+            </View>
+            <View style={styles.revenueRow}>
+              <Text style={styles.revenueLabel}>Tổng cộng:</Text>
+              <Text style={[styles.revenueValue, styles.totalRevenue]}>{formatCurrency(analyticsData.revenue.total)}</Text>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {/* Products Tab */}
+      {selectedTab === 'products' && (
+        <View style={styles.content}>
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionTitle}>Thống kê sản phẩm</Text>
+            <View style={styles.productStatsRow}>
+              <Text style={styles.productStatsLabel}>Tổng sản phẩm:</Text>
+              <Text style={styles.productStatsValue}>{analyticsData.products.total}</Text>
+            </View>
+            <View style={styles.productStatsRow}>
+              <Text style={styles.productStatsLabel}>Đã bán:</Text>
+              <Text style={styles.productStatsValue}>
+                {analyticsData.products.bestsellers.reduce((sum, p) => sum + p.sold, 0)}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionTitle}>Top sản phẩm bán chạy</Text>
+            {analyticsData.products.bestsellers.map((product, index) => (
+              <View key={product.id} style={styles.productRow}>
+                <Text style={styles.productRank}>#{index + 1}</Text>
+                <View style={styles.productInfo}>
+                  <Text style={styles.productName}>{product.name}</Text>
+                  <Text style={styles.productSold}>{product.sold} lượt bán</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        </View>
+      )}
     </ScrollView>
   );
 };
@@ -235,197 +316,236 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
-  tabBar: {
-    flexDirection: 'row',
+  header: {
     backgroundColor: '#fff',
-    paddingVertical: 12,
+    padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
-  tabButton: {
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 5,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: '#666',
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    marginTop: 10,
+    marginHorizontal: 15,
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  tab: {
     flex: 1,
+    paddingVertical: 15,
     alignItems: 'center',
-    paddingVertical: 8,
+    backgroundColor: '#f8f9fa',
   },
-  activeTabButton: {
-    borderBottomWidth: 2,
-    borderBottomColor: '#3498db',
+  activeTab: {
+    backgroundColor: '#007bff',
   },
-  tabButtonText: {
-    fontSize: 14,
+  tabText: {
+    fontSize: 16,
     fontWeight: '500',
-    color: '#757575',
+    color: '#666',
   },
-  activeTabButtonText: {
-    color: '#3498db',
-    fontWeight: '600',
+  activeTabText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
-  tabContent: {
-    padding: 16,
+  content: {
+    padding: 15,
   },
-  statsContainer: {
+  cardRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    flexWrap: 'wrap',
-    marginBottom: 24,
+    marginBottom: 15,
   },
-  statCard: {
+  kpiCard: {
+    flex: 1,
     backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    width: '31%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    padding: 20,
+    borderRadius: 10,
+    marginHorizontal: 5,
     elevation: 2,
   },
-  statTitle: {
+  kpiTitle: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 8,
+  },
+  kpiValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 5,
+  },
+  kpiChange: {
     fontSize: 12,
-    fontWeight: '500',
-    color: '#757575',
-    marginBottom: 8,
-  },
-  statValue: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#212121',
-    marginBottom: 8,
-  },
-  statFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  statLabel: {
-    fontSize: 11,
-    color: '#9e9e9e',
-  },
-  statusIndicator: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
   },
   positive: {
-    backgroundColor: 'rgba(76, 175, 80, 0.2)',
+    color: '#4CAF50',
   },
   negative: {
-    backgroundColor: 'rgba(244, 67, 54, 0.2)',
+    color: '#F44336',
   },
-  statusText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#212121',
-  },
-  chartContainer: {
+  sectionCard: {
     backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  chartTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#212121',
-    marginBottom: 16,
-  },
-  chart: {
-    height: 220,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-  },
-  barContainer: {
-    alignItems: 'center',
-    width: 36,
-  },
-  bar: {
-    width: 24,
-    backgroundColor: '#3498db',
-    borderTopLeftRadius: 4,
-    borderTopRightRadius: 4,
-  },
-  barLabel: {
-    marginTop: 8,
-    fontSize: 12,
-    color: '#9e9e9e',
-  },
-  bestsellersContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    padding: 20,
+    borderRadius: 10,
+    marginBottom: 15,
     elevation: 2,
   },
   sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 15,
+  },
+  bestsellerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  bestsellerRank: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#007bff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  rankText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  bestsellerInfo: {
+    flex: 1,
+  },
+  bestsellerName: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#212121',
-    marginBottom: 16,
+    fontWeight: '500',
+    color: '#333',
+  },
+  bestsellerSold: {
+    fontSize: 14,
+    color: '#666',
+  },
+  chartCard: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    marginBottom: 15,
+    elevation: 2,
+  },
+  chartTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 20,
+  },
+  chart: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'flex-end',
+    height: 250,
+  },
+  chartColumn: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  chartBar: {
+    width: 20,
+    backgroundColor: '#007bff',
+    borderRadius: 2,
+    marginBottom: 10,
+  },
+  chartLabel: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 5,
+  },
+  chartValue: {
+    fontSize: 10,
+    color: '#999',
+  },
+  revenueDetailCard: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    elevation: 2,
+  },
+  revenueRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  revenueLabel: {
+    fontSize: 16,
+    color: '#666',
+  },
+  revenueValue: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
+  },
+  totalRevenue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#007bff',
+  },
+  productStatsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  productStatsLabel: {
+    fontSize: 16,
+    color: '#666',
+  },
+  productStatsValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
   },
   productRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingVertical: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
   },
   productRank: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#3498db',
-    width: 32,
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#007bff',
+    width: 40,
+  },
+  productInfo: {
+    flex: 1,
+    marginLeft: 15,
   },
   productName: {
-    flex: 1,
-    fontSize: 14,
-    color: '#212121',
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
+    marginBottom: 5,
   },
   productSold: {
     fontSize: 14,
-    fontWeight: '500',
-    color: '#757575',
-  },
-  detailCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  detailLabel: {
-    fontSize: 14,
-    color: '#757575',
-  },
-  detailValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#212121',
-  },
-  detailValueContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    color: '#666',
   },
 });
 

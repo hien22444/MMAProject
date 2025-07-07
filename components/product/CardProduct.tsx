@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, TextInput } from "react-native";
 import { Product } from "../../types/product";
+import { Product as ContextProduct } from "../../contexts/ProductContext";
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from "@react-navigation/native";
 
 type RootStackParamList = {
   Home: undefined;
-  ProductDetail: { product: Product };
+  ProductDetail: { product: ContextProduct };
   Cart: undefined;
   Profile: undefined;
 };
@@ -15,10 +16,39 @@ type Prop = {
 }
 const CardProduct: React.FC<Prop> = ({product}) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  
+  // Convert to ContextProduct for navigation
+  const convertToContextProduct = (oldProduct: Product): ContextProduct => {
+    // Handle image conversion
+    let imageUrl = '';
+    if (typeof oldProduct.image === 'string') {
+      imageUrl = oldProduct.image;
+    } else if (oldProduct.image && typeof oldProduct.image === 'object' && 'uri' in oldProduct.image) {
+      imageUrl = (oldProduct.image as any).uri || '';
+    } else {
+      imageUrl = 'https://via.placeholder.com/300x300';
+    }
+
+    return {
+      id: oldProduct.id,
+      name: oldProduct.name,
+      description: oldProduct.describe,
+      price: parseInt(oldProduct.price.replace(/\D/g, '')),
+      imageUrl: imageUrl,
+      category: 'Chưa phân loại',
+      inStock: 50,
+      rating: 4.5,
+      brand: 'Local Brand',
+      colors: ['Đa dạng'],
+      sizes: ['S', 'M', 'L'],
+      createdAt: new Date().toISOString(),
+      isFeatured: false
+    };
+  };
 
   return (
     <TouchableOpacity 
-    onPress={() => navigation.navigate('ProductDetail',{product})}
+    onPress={() => navigation.navigate('ProductDetail',{product: convertToContextProduct(product)})}
     style ={styles.card}
     >
     <Image source={product.image} style={styles.productImage} />

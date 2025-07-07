@@ -10,15 +10,20 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { CommonActions } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function ProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { currentUser, logout } = useAuth();
+  const handleLogout = () => {
+    // Chỉ gọi logout() - RootNavigator sẽ tự động xử lý việc điều hướng
+    logout();
+  };
 
   const handlePress = (label: string) => {
-    // if (label === 'Danh sách yêu thích') {
-    //   navigation.navigate('Wishlist');
     if (label === 'Đơn hàng của tôi') {
       navigation.navigate('OrderHistory');
     } else if (label === 'Địa chỉ giao hàng') {
@@ -29,8 +34,12 @@ export default function ProfileScreen() {
       navigation.navigate('HelpCenter');
     } else if (label === 'Chính sách & Điều khoản') {
       navigation.navigate('Policy');
+    } else if (label === 'Giới thiệu') {
+      navigation.navigate('About');
     } else if (label === 'Chỉnh sửa hồ sơ') {
       navigation.navigate('MyProfile');
+    } else if (label === 'Đăng xuất') {
+      handleLogout();
     } else {
       Alert.alert('Tính năng', `Bạn đã chọn: ${label}`);
     }
@@ -38,52 +47,92 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      {/* Thông tin người dùng */}
-      <View style={styles.profileHeader}>
-        <Image
-          source={{
-            uri: 'https://img.freepik.com/premium-vector/male-face-avatar-icon-set-flat-design-social-media-profiles_1281173-3806.jpg?semt=ais_hybrid&w=740',
-          }}
-          style={styles.avatar}
-        />
-        <Text style={styles.name}>Nguyễn Văn A</Text>
-        <Text style={styles.info}>nguyenvana@gmail.com</Text>
-        <Text style={styles.info}>0909 123 456</Text>
+      {!currentUser ? (
+        // Guest Profile View
+        <>
+          <View style={styles.profileHeader}>
+            <Image
+              source={{
+                uri: 'https://img.freepik.com/premium-vector/male-face-avatar-icon-set-flat-design-social-media-profiles_1281173-3806.jpg?semt=ais_hybrid&w=740',
+              }}
+              style={styles.avatar}
+            />
+            <Text style={styles.name}>Khách</Text>
+            <Text style={styles.info}>Đăng nhập để sử dụng đầy đủ tính năng</Text>
 
-        <View style={styles.actionRow}>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => handlePress('Chỉnh sửa hồ sơ')}
-          >
-            <Ionicons name="create-outline" size={20} color="#fff" />
-            {/* {renderItem('Chỉnh sửa hồ sơ', 'create-outline')} */}
-            <Text style={styles.actionText}>Chỉnh sửa</Text>
-          </TouchableOpacity>
-          {/* <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => handlePress('Đổi mật khẩu')}
-          >
-            <Ionicons name="lock-closed-outline" size={20} color="#fff" />
-            <Text style={styles.actionText}>Đổi mật khẩu</Text>
-          </TouchableOpacity> */}
-        </View>
-      </View>
+            <View style={styles.actionRow}>
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={() => navigation.navigate('Login')}
+              >
+                <Ionicons name="log-in-outline" size={20} color="#fff" />
+                <Text style={styles.actionText}>Đăng nhập</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.secondaryButton]}
+                onPress={() => navigation.navigate('Register')}
+              >
+                <Ionicons name="person-add-outline" size={20} color="#007bff" />
+                <Text style={styles.secondaryButtonText}>Đăng ký</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
 
-      {/* Danh sách chức năng */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Tài khoản</Text>
-        {renderItem('Đơn hàng của tôi', 'cube-outline')}
-        {/* {renderItem('Danh sách yêu thích', 'heart-outline')} */}
-        {renderItem('Địa chỉ giao hàng', 'location-outline')}
-      </View>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Tính năng cho khách</Text>
+            {renderItem('Trung tâm trợ giúp', 'help-circle-outline')}
+            {renderItem('Chính sách & Điều khoản', 'document-text-outline')}
+            {renderItem('Giới thiệu', 'information-circle-outline')}
+          </View>
+        </>
+      ) : (
+        // Logged in user profile
+        <>
+          <View style={styles.profileHeader}>
+            <Image
+              source={{
+                uri: 'https://img.freepik.com/premium-vector/male-face-avatar-icon-set-flat-design-social-media-profiles_1281173-3806.jpg?semt=ais_hybrid&w=740',
+              }}
+              style={styles.avatar}
+            />
+            <Text style={styles.name}>
+              {currentUser?.role === 'admin' ? 'Administrator' : 'Nguyễn Văn A'}
+            </Text>
+            <Text style={styles.info}>{currentUser?.email}</Text>
+            <Text style={styles.info}>0909 123 456</Text>
+            {currentUser?.role === 'admin' && (
+              <View style={styles.adminBadge}>
+                <Text style={styles.adminBadgeText}>Admin</Text>
+              </View>
+            )}
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Hỗ trợ & Cài đặt</Text>
-        {renderItem('Cài đặt tài khoản', 'settings-outline')}
-        {renderItem('Trung tâm trợ giúp', 'help-circle-outline')}
-        {renderItem('Chính sách & Điều khoản', 'document-text-outline')}
-        {renderItem('Đăng xuất', 'log-out-outline')}
-      </View>
+            <View style={styles.actionRow}>
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={() => handlePress('Chỉnh sửa hồ sơ')}
+              >
+                <Ionicons name="create-outline" size={20} color="#fff" />
+                <Text style={styles.actionText}>Chỉnh sửa</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Danh sách chức năng */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Tài khoản</Text>
+            {renderItem('Đơn hàng của tôi', 'cube-outline')}
+            {renderItem('Địa chỉ giao hàng', 'location-outline')}
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Hỗ trợ & Cài đặt</Text>
+            {renderItem('Cài đặt tài khoản', 'settings-outline')}
+            {renderItem('Trung tâm trợ giúp', 'help-circle-outline')}
+            {renderItem('Chính sách & Điều khoản', 'document-text-outline')}
+            {renderItem('Đăng xuất', 'log-out-outline')}
+          </View>
+        </>
+      )}
     </ScrollView>
   );
 
@@ -141,6 +190,28 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginLeft: 6,
     fontSize: 14,
+  },
+  secondaryButton: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#007bff',
+  },
+  secondaryButtonText: {
+    color: '#007bff',
+    marginLeft: 6,
+    fontSize: 14,
+  },
+  adminBadge: {
+    backgroundColor: '#28a745',
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 15,
+    marginTop: 10,
+  },
+  adminBadgeText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 12,
   },
   section: {
     paddingHorizontal: 20,

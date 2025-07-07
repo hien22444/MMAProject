@@ -9,29 +9,14 @@ import {
   TextInput,
   Modal,
   ScrollView,
-  Alert
+  Alert,
+  ActivityIndicator
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
-// Import dữ liệu mẫu
-import { products } from '../data/products';
+// Import contexts
+import { useProducts, Product } from '../contexts/ProductContext';
 import { categories } from '../data/categories';
-
-// Định nghĩa kiểu dữ liệu
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  imageUrl: string;
-  category: string;
-  inStock: number;
-  rating: number;
-  brand: string;
-  colors: string[];
-  sizes: string[];
-  createdAt: string;
-  isFeatured: boolean;
-}
 
 interface Category {
   id: string;
@@ -39,7 +24,7 @@ interface Category {
 }
 
 const ProductManagementScreen = () => {
-  const [productList, setProductList] = useState<Product[]>(products);
+  const { products, addProduct, updateProduct, deleteProduct } = useProducts();
   const [searchQuery, setSearchQuery] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
@@ -62,9 +47,8 @@ const ProductManagementScreen = () => {
   const handleSearch = (text: string) => {
     setSearchQuery(text);
   };
-
   // Lọc sản phẩm theo tìm kiếm và danh mục
-  const filteredProducts = productList.filter(product => {
+  const filteredProducts = products.filter((product: Product) => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           product.description.toLowerCase().includes(searchQuery.toLowerCase());
     
@@ -106,7 +90,6 @@ const ProductManagementScreen = () => {
     });
     setModalVisible(true);
   };
-
   // Xử lý xóa sản phẩm
   const handleDeleteProduct = (productId: string) => {
     Alert.alert(
@@ -117,15 +100,13 @@ const ProductManagementScreen = () => {
         { 
           text: 'Xóa', 
           onPress: () => {
-            const updatedProducts = productList.filter(p => p.id !== productId);
-            setProductList(updatedProducts);
+            deleteProduct(productId);
           },
           style: 'destructive' 
         }
       ]
     );
   };
-
   // Xử lý lưu sản phẩm (thêm mới hoặc cập nhật)
   const handleSaveProduct = () => {
     // Kiểm tra dữ liệu
@@ -141,10 +122,8 @@ const ProductManagementScreen = () => {
 
     if (currentProduct) {
       // Cập nhật sản phẩm hiện có
-      const updatedProducts = productList.map(p => 
-        p.id === currentProduct.id ? { ...currentProduct, ...formData } : p
-      );
-      setProductList(updatedProducts);
+      const updatedProduct = { ...currentProduct, ...formData } as Product;
+      updateProduct(updatedProduct);
     } else {
       // Tạo sản phẩm mới
       const newProduct = {
@@ -155,7 +134,7 @@ const ProductManagementScreen = () => {
         isFeatured: false
       } as Product;
 
-      setProductList([...productList, newProduct]);
+      addProduct(newProduct);
     }
 
     setModalVisible(false);
@@ -165,7 +144,6 @@ const ProductManagementScreen = () => {
   const handleChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
-
   // Xử lý đổi danh mục
   const handleCategoryChange = (categoryName: string) => {
     setSelectedCategory(categoryName === selectedCategory ? null : categoryName);
@@ -179,8 +157,21 @@ const ProductManagementScreen = () => {
       <View style={styles.productInfo}>
         <Text style={styles.productName}>{item.name}</Text>
         <Text style={styles.productPrice}>{item.price.toLocaleString('vi-VN')} đ</Text>
-        <Text style={styles.productCategory}>Danh mục: {item.category}</Text>
-        <Text style={styles.productStock}>Kho: {item.inStock} sản phẩm</Text>
+        <View style={styles.productMetaRow}>
+          <View style={styles.productMetaItem}>
+            <Ionicons name="apps-outline" size={14} color="#666" />
+            <Text style={styles.productCategory}>{item.category}</Text>
+          </View>
+          <View style={styles.productMetaItem}>
+            <Ionicons name="cube-outline" size={14} color="#666" />
+            <Text style={styles.productStock}>{item.inStock}</Text>
+          </View>
+        </View>
+        {item.isFeatured && (
+          <View style={styles.featuredBadge}>
+            <Text style={styles.featuredText}>Featured</Text>
+          </View>
+        )}
       </View>
       
       <View style={styles.productActions}>
@@ -188,14 +179,16 @@ const ProductManagementScreen = () => {
           style={[styles.actionButton, styles.editButton]} 
           onPress={() => handleEditProduct(item)}
         >
-          <Text style={styles.buttonText}>Sửa</Text>
+          <Ionicons name="create-outline" size={16} color="#fff" />
+          <Text style={styles.buttonText}>Edit</Text>
         </TouchableOpacity>
         
         <TouchableOpacity 
           style={[styles.actionButton, styles.deleteButton]} 
           onPress={() => handleDeleteProduct(item.id)}
         >
-          <Text style={styles.buttonText}>Xóa</Text>
+          <Ionicons name="trash-outline" size={16} color="#fff" />
+          <Text style={styles.buttonText}>Delete</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -220,47 +213,73 @@ const ProductManagementScreen = () => {
       </Text>
     </TouchableOpacity>
   );
-
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Quản lý sản phẩm</Text>
-      
-      <View style={styles.searchBar}>
-        <TextInput
-          placeholder="Tìm kiếm sản phẩm..."
-          style={styles.searchInput}
-          value={searchQuery}
-          onChangeText={handleSearch}
-        />
-      </View>
-
-      <Text style={styles.sectionTitle}>Danh mục</Text>
-      <FlatList
-        data={categories}
-        renderItem={renderCategoryItem}
-        keyExtractor={(item) => item.id}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.categoryList}
-      />
-      
-      <View style={styles.productListHeader}>
-        <Text style={styles.sectionTitle}>Danh sách sản phẩm</Text>
-        <TouchableOpacity 
-          style={styles.addButton} 
-          onPress={handleAddProduct}
-        >
-          <Text style={styles.addButtonText}>+ Thêm mới</Text>
-        </TouchableOpacity>
-      </View>
-
-      <FlatList
-        data={filteredProducts}
-        renderItem={renderProductItem}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.productList}
-        showsVerticalScrollIndicator={false}
-      />
+      <ScrollView 
+        showsVerticalScrollIndicator={true}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <Text style={styles.heading}>Quản lý sản phẩm</Text>
+        
+        <View style={styles.searchBar}>
+          <Ionicons name="search-outline" size={20} color="#666" style={styles.searchIcon} />
+          <TextInput
+            placeholder="Tìm kiếm sản phẩm..."
+            style={styles.searchInput}
+            value={searchQuery}
+            onChangeText={handleSearch}
+          />
+        </View>
+  
+        <Text style={styles.categoryTitle}>Danh mục</Text>
+        <View style={styles.categoriesContainer}>
+          <FlatList
+            data={categories}
+            renderItem={renderCategoryItem}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoriesList}
+          />
+        </View>
+        
+        <View style={styles.sortContainer}>
+          <TouchableOpacity style={styles.sortButton}>
+            <Ionicons name="arrow-up" size={16} color="#555" />
+            <Text style={styles.sortText}>Giá tăng dần</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.sortButton}>
+            <Ionicons name="arrow-down" size={16} color="#555" />
+            <Text style={styles.sortText}>Giá giảm dần</Text>
+          </TouchableOpacity>
+        </View>
+  
+        <View style={styles.productListHeader}>
+          <Text style={styles.sectionTitle}>Danh sách sản phẩm</Text>
+          <TouchableOpacity 
+            style={styles.addButton} 
+            onPress={handleAddProduct}
+          >
+            <Text style={styles.addButtonText}>+ Thêm mới</Text>
+          </TouchableOpacity>
+        </View>
+  
+        {filteredProducts.length > 0 ? (
+          <View style={styles.productListContainer}>
+            {filteredProducts.map((item) => (
+              <View key={item.id}>
+                {renderProductItem({item})}
+              </View>
+            ))}
+          </View>
+        ) : (
+          <View style={styles.emptyState}>
+            <Ionicons name="cube-outline" size={50} color="#ccc" />
+            <Text style={styles.emptyStateText}>Không tìm thấy sản phẩm</Text>
+          </View>
+        )}
+      </ScrollView>
 
       {/* Modal thêm/sửa sản phẩm */}
       <Modal
@@ -398,170 +417,213 @@ const ProductManagementScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#f9f9f9',
     padding: 16,
   },
+  scrollContent: {
+    paddingBottom: 80, // Add padding at bottom for better scroll experience
+    flexGrow: 1,
+  },
   heading: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 16,
     color: '#333',
   },
   searchBar: {
     backgroundColor: '#fff',
-    borderRadius: 8,
-    marginBottom: 16,
+    paddingVertical: 10,
     paddingHorizontal: 16,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#eee',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
   },
+  searchIcon: {
+    marginRight: 8,
+  },
   searchInput: {
-    height: 44,
+    flex: 1,
     fontSize: 16,
+    marginLeft: 8,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 12,
-    color: '#333',
-  },
-  categoryList: {
-    paddingVertical: 8,
+  categoriesContainer: {
     marginBottom: 16,
   },
+  categoryTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 10,
+    color: '#333',
+  },  
+  categoriesList: {
+    flexDirection: 'row',
+  },
   categoryItem: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     paddingVertical: 8,
-    marginRight: 12,
     borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 1,
-    elevation: 1,
+    backgroundColor: '#f0f0f0',
+    marginRight: 8,
+    marginBottom: 8,
   },
   categoryItemSelected: {
     backgroundColor: '#E91E63',
   },
   categoryText: {
     fontSize: 14,
-    color: '#333',
+    color: '#555',
   },
   categoryTextSelected: {
     color: '#fff',
     fontWeight: '500',
   },
-  productListHeader: {
+  sortContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  sortButton: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    backgroundColor: '#fff',
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginRight: 10,
   },
-  addButton: {
-    backgroundColor: '#E91E63',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 4,
-  },
-  addButtonText: {
-    color: '#fff',
-    fontWeight: '500',
+  sortText: {
+    fontSize: 14,
+    color: '#555',
+    marginLeft: 4,
   },
   productList: {
-    paddingBottom: 16,
+    flex: 1,
+  },
+  productListContainer: {
+    marginBottom: 16,
   },
   productItem: {
-    flexDirection: 'row',
     backgroundColor: '#fff',
-    borderRadius: 8,
+    borderRadius: 10,
     marginBottom: 16,
+    flexDirection: 'row',
+    overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 2,
+    shadowRadius: 4,
     elevation: 2,
   },
   productImage: {
     width: 100,
     height: 100,
-    borderTopLeftRadius: 8,
-    borderBottomLeftRadius: 8,
     backgroundColor: '#f0f0f0',
   },
   productInfo: {
-    flex: 1,
     padding: 12,
+    flex: 1,
   },
   productName: {
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 4,
+    color: '#333',
   },
   productPrice: {
     fontSize: 15,
+    fontWeight: '700',
     color: '#E91E63',
-    fontWeight: '500',
+    marginBottom: 6,
+  },
+  productMetaRow: {
+    flexDirection: 'row',
     marginBottom: 4,
+  },
+  productMetaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 12,
   },
   productCategory: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#666',
-    marginBottom: 4,
+    marginLeft: 4,
   },
   productStock: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#666',
+    marginLeft: 4,
+  },
+  featuredBadge: {
+    backgroundColor: '#4caf50',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 4,
+    alignSelf: 'flex-start',
+    marginTop: 4,
+  },
+  featuredText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: '600',
   },
   productActions: {
+    padding: 10,
     justifyContent: 'center',
-    padding: 8,
   },
   actionButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
     borderRadius: 4,
-    marginBottom: 8,
+    marginBottom: 6,
+    flexDirection: 'row',
     alignItems: 'center',
-  },
-  editButton: {
-    backgroundColor: '#2196F3',
-  },
-  deleteButton: {
-    backgroundColor: '#ff6b6b',
+    justifyContent: 'center',
   },
   buttonText: {
     color: '#fff',
-    fontWeight: '500',
+    fontSize: 13,
+    marginLeft: 4,
   },
-  // Modal styles
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
+  editButton: {
+    backgroundColor: '#3498db',
+  },
+  deleteButton: {
+    backgroundColor: '#e74c3c',
+  },
+  addButton: {
+    backgroundColor: '#E91E63',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   modalContainer: {
-    width: '90%',
-    maxHeight: '90%',
     backgroundColor: '#fff',
-    borderRadius: 8,
+    borderRadius: 10,
     padding: 20,
+    width: '90%',
+    maxHeight: '80%',
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 20,
     color: '#333',
+    textAlign: 'center',
   },
   formGroup: {
-    marginBottom: 16,
-  },
-  formRow: {
-    flexDirection: 'row',
     marginBottom: 16,
   },
   label: {
@@ -571,28 +633,44 @@ const styles = StyleSheet.create({
     color: '#555',
   },
   input: {
-    backgroundColor: '#f9f9f9',
     borderWidth: 1,
     borderColor: '#ddd',
-    borderRadius: 4,
-    padding: 12,
-    fontSize: 14,
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    fontSize: 16,
   },
   textArea: {
     height: 100,
+    textAlignVertical: 'top',
   },
   pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 6,
+    marginBottom: 16,
+  },
+  pickerButton: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 8,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+  },
+  pickerText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  pickerOptions: {
+    maxHeight: 200,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
   },
   pickerItem: {
-    backgroundColor: '#f1f1f1',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 16,
-    marginRight: 8,
-    marginBottom: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
   pickerItemSelected: {
     backgroundColor: '#E91E63',
@@ -627,6 +705,43 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: '#fff',
     fontWeight: '500',
+  },
+  productListHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  formRow: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
+  },
+  emptyStateText: {
+    fontSize: 16,
+    color: '#999',
+    marginTop: 10,
   },
 });
 

@@ -14,26 +14,9 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 
-// Import dữ liệu mẫu
-import { products } from '../data/products';
+// Import contexts
+import { useProducts, Product } from '../contexts/ProductContext';
 import { categories } from '../data/categories';
-
-// Định nghĩa kiểu dữ liệu
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  imageUrl: string;
-  category: string;
-  inStock: number;
-  rating: number;
-  brand: string;
-  colors: string[];
-  sizes: string[];
-  createdAt: string;
-  isFeatured: boolean;
-}
 
 interface Category {
   id: string;
@@ -64,6 +47,8 @@ const ProductListScreen = () => {
   const handleSort = (option: string) => {
     setSortOption(sortOption === option ? null : option);
   };
+  // Access products from context
+  const { products } = useProducts();
 
   // Lọc và sắp xếp sản phẩm
   const getFilteredProducts = () => {
@@ -98,7 +83,10 @@ const ProductListScreen = () => {
 
   // Render item trong danh sách sản phẩm
   const renderProductItem = ({ item }: { item: Product }) => (
-    <TouchableOpacity style={styles.productCard}>
+    <TouchableOpacity 
+      style={styles.productCard}
+      onPress={() => navigation.navigate('ProductDetail', { product: item })}
+    >
       <View style={styles.discountBadge}>
         <Text style={styles.discountText}>-20%</Text>
       </View>
