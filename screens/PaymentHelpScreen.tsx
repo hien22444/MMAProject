@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import RequireAuth from '../components/RequireAuth';
 
 const paymentMethods = [
     {
@@ -67,10 +68,11 @@ const paymentFaqs = [
 
 export default function PaymentHelpScreen() {
     return (
-        <View style={styles.container}>
-            <Text style={styles.header}>💳 Thanh toán</Text>
+        <RequireAuth message="Đăng nhập để xem thông tin về thanh toán">
+            <View style={styles.container}>
+                <Text style={styles.header}>💳 Thanh toán</Text>
 
-            <ScrollView style={styles.content}>
+                <ScrollView style={styles.content}>
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Phương thức thanh toán</Text>
 
@@ -155,6 +157,7 @@ export default function PaymentHelpScreen() {
                 </View>
             </ScrollView>
         </View>
+        </RequireAuth>
     );
 }
 

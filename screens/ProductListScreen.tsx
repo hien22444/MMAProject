@@ -16,6 +16,7 @@ import { RootStackParamList } from '../types/navigation';
 
 // Import contexts
 import { useProducts, Product } from '../contexts/ProductContext';
+import { useAuth } from '../contexts/AuthContext';
 import { categories } from '../data/categories';
 
 interface Category {
@@ -28,6 +29,7 @@ interface Category {
 
 const ProductListScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { currentUser } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [sortOption, setSortOption] = useState<string | null>(null);
@@ -171,6 +173,8 @@ const ProductListScreen = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Điều hướng ứng dụng</Text>
+            
+            {/* Menu items for all users */}
             <TouchableOpacity
               style={styles.navigationButton}
               onPress={() => {
@@ -191,65 +195,75 @@ const ProductListScreen = () => {
               <Text style={styles.navigationButtonText}>Tìm kiếm</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.navigationButton}
-              onPress={() => {
-                navigation.navigate('Address');
-                setMenuVisible(false);
-              }}
-            >
-              <Text style={styles.navigationButtonText}>Quản lý địa chỉ</Text>
-            </TouchableOpacity>
+            {/* Menu items only for logged in users */}
+            {currentUser && (
+              <>
+                <TouchableOpacity
+                  style={styles.navigationButton}
+                  onPress={() => {
+                    navigation.navigate('Address');
+                    setMenuVisible(false);
+                  }}
+                >
+                  <Text style={styles.navigationButtonText}>Quản lý địa chỉ</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.navigationButton}
-              onPress={() => {
-                navigation.navigate('Notification');
-                setMenuVisible(false);
-              }}
-            >
-              <Text style={styles.navigationButtonText}>Thông báo</Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.navigationButton}
+                  onPress={() => {
+                    navigation.navigate('Notification');
+                    setMenuVisible(false);
+                  }}
+                >
+                  <Text style={styles.navigationButtonText}>Thông báo</Text>
+                </TouchableOpacity>
+              </>
+            )}
 
-            <TouchableOpacity
-              style={styles.navigationButton}
-              onPress={() => {
-                navigation.navigate('ProductManagement');
-                setMenuVisible(false);
-              }}
-            >
-              <Text style={styles.navigationButtonText}>Quản lý sản phẩm</Text>
-            </TouchableOpacity>
+            {/* Admin-only menu items */}
+            {currentUser?.role === 'admin' && (
+              <>
+                <TouchableOpacity
+                  style={styles.navigationButton}
+                  onPress={() => {
+                    navigation.navigate('ProductManagement');
+                    setMenuVisible(false);
+                  }}
+                >
+                  <Text style={styles.navigationButtonText}>Quản lý sản phẩm</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.navigationButton}
-              onPress={() => {
-                navigation.navigate('OrderManagement');
-                setMenuVisible(false);
-              }}
-            >
-              <Text style={styles.navigationButtonText}>Quản lý đơn hàng</Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.navigationButton}
+                  onPress={() => {
+                    navigation.navigate('OrderManagement');
+                    setMenuVisible(false);
+                  }}
+                >
+                  <Text style={styles.navigationButtonText}>Quản lý đơn hàng</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.navigationButton}
-              onPress={() => {
-                navigation.navigate('CategoryManagement');
-                setMenuVisible(false);
-              }}
-            >
-              <Text style={styles.navigationButtonText}>Quản lý danh mục</Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.navigationButton}
+                  onPress={() => {
+                    navigation.navigate('CategoryManagement');
+                    setMenuVisible(false);
+                  }}
+                >
+                  <Text style={styles.navigationButtonText}>Quản lý danh mục</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.navigationButton}
-              onPress={() => {
-                navigation.navigate('Analytics');
-                setMenuVisible(false);
-              }}
-            >
-              <Text style={styles.navigationButtonText}>Thống kê</Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.navigationButton}
+                  onPress={() => {
+                    navigation.navigate('Analytics');
+                    setMenuVisible(false);
+                  }}
+                >
+                  <Text style={styles.navigationButtonText}>Thống kê</Text>
+                </TouchableOpacity>
+              </>
+            )}
 
             <TouchableOpacity
               style={[styles.navigationButton, styles.closeButton]}

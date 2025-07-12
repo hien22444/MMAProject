@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import RequireAuth from '../components/RequireAuth';
 
 const refundPolicies = [
     {
@@ -84,10 +85,11 @@ const refundFaqs = [
 
 export default function RefundHelpScreen() {
     return (
-        <View style={styles.container}>
-            <Text style={styles.header}>🔄 Hoàn trả & Hoàn tiền</Text>
+        <RequireAuth message="Đăng nhập để xem thông tin về hoàn trả và hoàn tiền">
+            <View style={styles.container}>
+                <Text style={styles.header}>🔄 Hoàn trả & Hoàn tiền</Text>
 
-            <ScrollView style={styles.content}>
+                <ScrollView style={styles.content}>
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Chính sách đổi trả</Text>
 
@@ -184,6 +186,7 @@ export default function RefundHelpScreen() {
                 </View>
             </ScrollView>
         </View>
+        </RequireAuth>
     );
 }
 

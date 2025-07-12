@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import RequireAuth from '../components/RequireAuth';
 
 const orderFaqs = [
     {
@@ -32,10 +33,11 @@ const orderFaqs = [
 
 export default function OrderHelpScreen() {
     return (
-        <View style={styles.container}>
-            <Text style={styles.header}>📋 Về đơn hàng</Text>
+        <RequireAuth message="Đăng nhập để xem thông tin về đơn hàng và hỗ trợ">
+            <View style={styles.container}>
+                <Text style={styles.header}>📋 Về đơn hàng</Text>
 
-            <ScrollView style={styles.content}>
+                <ScrollView style={styles.content}>
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Câu hỏi thường gặp</Text>
 
@@ -98,6 +100,7 @@ export default function OrderHelpScreen() {
                 </View>
             </ScrollView>
         </View>
+        </RequireAuth>
     );
 }
 

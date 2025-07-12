@@ -20,6 +20,8 @@ import PaymentScreen from '../screens/PaymentScreen';
 import CouponScreen from '../screens/CouponScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ProductDetail from '../screens/ProductDetail';
+import ProductListScreen from '../screens/ProductListScreen';
+import SearchScreen from '../screens/SearchScreen';
 import AddressScreen from '../screens/AddressScreen';
 import NotificationScreen from '../screens/NotificationScreen';
 import PolicyScreen from '../screens/PolicyScreen';
@@ -59,9 +61,18 @@ export default function RootNavigator() {
             <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
             <Stack.Screen name="Register" component={RegisterScreen} />
             <Stack.Screen name="ProductDetail" component={ProductDetail} />
+            <Stack.Screen name="ProductList" component={ProductListScreen} options={{ title: 'Danh sách sản phẩm' }} />
+            <Stack.Screen name="Search" component={SearchScreen} options={{ title: 'Tìm kiếm' }} />
             <Stack.Screen name="HelpCenter" component={HelpCenterScreen} />
             <Stack.Screen name="Policy" component={PolicyScreen} />
             <Stack.Screen name="About" component={AboutScreen} options={{ title: 'Giới thiệu' }} />
+            
+            {/* Help Center Screens for Guest - redirect to login */}
+            <Stack.Screen name="OrderHelp" component={OrderHelpScreen} options={{ title: 'Về đơn hàng' }} />
+            <Stack.Screen name="ShippingHelp" component={ShippingHelpScreen} options={{ title: 'Vận chuyển & Giao hàng' }} />
+            <Stack.Screen name="PaymentHelp" component={PaymentHelpScreen} options={{ title: 'Thanh toán' }} />
+            <Stack.Screen name="RefundHelp" component={RefundHelpScreen} options={{ title: 'Hoàn trả & Hoàn tiền' }} />
+            <Stack.Screen name="ContactHelp" component={ContactHelpScreen} options={{ title: 'Liên hệ hỗ trợ' }} />
           </>
         ) : currentUser.role === 'admin' ? (
           // Admin Screens
@@ -72,6 +83,8 @@ export default function RootNavigator() {
               options={{ headerShown: false, title: 'Admin Dashboard' }}
             />
             <Stack.Screen name="ProductDetail" component={ProductDetail} />
+            <Stack.Screen name="ProductList" component={ProductListScreen} options={{ title: 'Danh sách sản phẩm' }} />
+            <Stack.Screen name="Search" component={SearchScreen} options={{ title: 'Tìm kiếm' }} />
           </>
         ) : (
           // Customer Screens
@@ -84,6 +97,8 @@ export default function RootNavigator() {
             <Stack.Screen name="AccountSettings" component={AccountSettingsScreen} />
             <Stack.Screen name="HelpCenter" component={HelpCenterScreen} />
             <Stack.Screen name="ProductDetail" component={ProductDetail} />
+            <Stack.Screen name="ProductList" component={ProductListScreen} options={{ title: 'Danh sách sản phẩm' }} />
+            <Stack.Screen name="Search" component={SearchScreen} options={{ title: 'Tìm kiếm' }} />
             <Stack.Screen name="Address" component={AddressScreen} options={{ title: 'Địa chỉ giao hàng' }} />
             <Stack.Screen name="Notification" component={NotificationScreen} options={{ title: 'Thông báo' }} />
             <Stack.Screen name="Support" component={SupportScreen} options={{ title: "Hỗ trợ" }} />

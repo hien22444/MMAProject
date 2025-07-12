@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import RequireAuth from '../components/RequireAuth';
 
 const shippingFaqs = [
     {
@@ -56,10 +57,11 @@ const shippingMethods = [
 
 export default function ShippingHelpScreen() {
     return (
-        <View style={styles.container}>
-            <Text style={styles.header}>🚚 Vận chuyển & Giao hàng</Text>
+        <RequireAuth message="Đăng nhập để xem thông tin về vận chuyển và giao hàng">
+            <View style={styles.container}>
+                <Text style={styles.header}>🚚 Vận chuyển & Giao hàng</Text>
 
-            <ScrollView style={styles.content}>
+                <ScrollView style={styles.content}>
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Phương thức vận chuyển</Text>
 
@@ -157,6 +159,7 @@ export default function ShippingHelpScreen() {
                 </View>
             </ScrollView>
         </View>
+        </RequireAuth>
     );
 }
 

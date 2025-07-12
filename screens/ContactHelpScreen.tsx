@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import RequireAuth from '../components/RequireAuth';
 
 const contactMethods = [
     {
@@ -97,10 +98,11 @@ const commonIssues = [
 
 export default function ContactHelpScreen() {
     return (
-        <View style={styles.container}>
-            <Text style={styles.header}>📞 Liên hệ hỗ trợ</Text>
+        <RequireAuth message="Đăng nhập để xem thông tin liên hệ hỗ trợ">
+            <View style={styles.container}>
+                <Text style={styles.header}>📞 Liên hệ hỗ trợ</Text>
 
-            <ScrollView style={styles.content}>
+                <ScrollView style={styles.content}>
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Phương thức liên hệ</Text>
 
@@ -230,6 +232,7 @@ export default function ContactHelpScreen() {
                 </View>
             </ScrollView>
         </View>
+        </RequireAuth>
     );
 }
 
