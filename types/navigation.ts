@@ -13,7 +13,11 @@ export type RootStackParamList = {
 
   OrderDetail: undefined;
 
-  Review: undefined;
+  Review: {
+    orderId?: string;
+    productId?: string;
+    productName?: string;
+  };
 
   Payment: { totalAmount: number };
 
