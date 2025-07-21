@@ -24,13 +24,27 @@ const DetailProduct: React.FC<{ product: Product }> = ({ product }) => {
   const { params } = useRoute<ProductDetailRouteProp>();
   const { addToCart } = useCart();
 
+  function formatSoldQuantity(quantity: number): string {
+    if (quantity >= 1_000_000) {
+      return `${(quantity / 1_000_000).toFixed(
+        quantity >= 10_000_000 ? 0 : 1
+      )}M+`;
+    } else if (quantity >= 1_000) {
+      return `${(quantity / 1_000).toFixed(quantity >= 10_000 ? 0 : 1)}K+`;
+    } else {
+      return quantity.toString();
+    }
+  }
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Image source={{ uri: product.imageUrl }} style={styles.image} />
       <Text style={styles.name}>{product.name}</Text>
       <Text style={styles.price}>{product.price.toLocaleString()}đ</Text>
       <View style={styles.infoRow}>
-        <Text style={styles.sold}>Đã bán: {product?.sold || "0"}</Text>
+        <Text style={styles.sold}>
+          Đã bán: {formatSoldQuantity(product?.sold) || "0"}
+        </Text>
       </View>
       <Text style={styles.describe}>{product.description}</Text>
       <View style={styles.buttonRow}>

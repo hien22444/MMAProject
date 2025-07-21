@@ -9,16 +9,14 @@ import {
   TextInput,
 } from "react-native";
 import { Product } from "../../types/product";
-import { Product as ContextProduct } from "../../contexts/ProductContext";
+import {
+  Product as ContextProduct,
+  useProducts,
+} from "../../contexts/ProductContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
+import { RootStackParamList } from "../../types/navigation";
 
-type RootStackParamList = {
-  Home: undefined;
-  ProductDetail: { product: ContextProduct };
-  Cart: undefined;
-  Profile: undefined;
-};
 type Prop = {
   product: Product;
 };
@@ -64,7 +62,7 @@ const CardProduct: React.FC<Prop> = ({ product }) => {
     <TouchableOpacity
       onPress={() =>
         navigation.navigate("ProductDetail", {
-          product: convertToContextProduct(product),
+          productId: product.id,
         })
       }
       style={styles.card}
@@ -78,7 +76,7 @@ const CardProduct: React.FC<Prop> = ({ product }) => {
       <Text style={styles.productDescribe} numberOfLines={1}>
         {product.describe}
       </Text>
-      <Text style={styles.productSold}>{product.sold}</Text>
+      <Text style={styles.productSold}>{product.sold} đã bán</Text>
     </TouchableOpacity>
   );
 };
@@ -192,7 +190,7 @@ const styles = StyleSheet.create({
 
   productSold: {
     fontSize: 12,
-    color: "#999",
+    color: "#777",
     marginTop: 2,
   },
 

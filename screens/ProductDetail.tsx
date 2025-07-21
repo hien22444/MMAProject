@@ -14,7 +14,8 @@ type ProductDetailProps = NativeStackScreenProps<
 >;
 
 const ProductDetail: React.FC<ProductDetailProps> = ({ route }) => {
-  const { product: productInfo } = route.params;
+  const { productId } = route.params;
+
   const [originProduct, setOriginProduct] = useState<
     ContextProduct | undefined | null
   >(null);
@@ -24,7 +25,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ route }) => {
 
   useEffect(() => {
     const fetchOriginProduct = async () => {
-      const data = await getProductById(productInfo.id);
+      const data = await getProductById(productId);
       setOriginProduct(data);
     };
     fetchOriginProduct();
@@ -39,10 +40,10 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ route }) => {
       <DetailProduct product={originProduct} />
       <ReviewList
         reviews={reviews
-          .filter((r) => r.productId === productInfo.id)
+          .filter((r) => r.productId === productId)
           .reverse()
           .splice(0, 2)}
-        productId={productInfo.id}
+        productId={productId}
       />
     </ScrollView>
   );

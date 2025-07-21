@@ -20,7 +20,8 @@ export type RootStackParamList = {
   HelpCenter: undefined;
   Tabs: undefined;
 
-  ProductDetail: { product: Product };
+  ProductDetail: { productId: string };
+
   Checkout: undefined;
   Login: undefined;
   Register: undefined;

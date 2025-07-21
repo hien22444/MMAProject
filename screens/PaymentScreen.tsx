@@ -11,6 +11,7 @@ import { RouteProp, useRoute, useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../types/navigation";
 import { useCart } from "../contexts/CartContext";
+import GlobalColors from "../constants/colors";
 
 type PaymentScreenRouteProp = RouteProp<RootStackParamList, "Payment">;
 type PaymentScreenNavigationProp = StackNavigationProp<RootStackParamList>;
@@ -60,7 +61,7 @@ const PaymentScreen = () => {
             <Icon
               name={method.icon}
               size={24}
-              color="#6200ee"
+              color={GlobalColors.primary}
               style={styles.methodIcon}
             />
             <Text style={styles.methodName}>{method.name}</Text>
@@ -96,7 +97,7 @@ const PaymentScreen = () => {
             style={styles.addCardButton}
             // onPress={() => navigation.navigate("AddCard")}
           >
-            <Icon name="add" size={24} color="#6200ee" />
+            <Icon name="add" size={24} color={GlobalColors.primary} />
             <Text style={styles.addCardText}>Thêm thẻ mới</Text>
           </TouchableOpacity>
         </View>
@@ -141,7 +142,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     marginBottom: 20,
-    color: "#6200ee",
+    color: GlobalColors.primary,
   },
   section: {
     marginBottom: 20,
@@ -154,7 +155,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 15,
-    color: "#6200ee",
+    color: GlobalColors.primary,
   },
   methodItem: {
     flexDirection: "row",
@@ -178,7 +179,7 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#6200ee",
+    borderColor: GlobalColors.primary,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -186,7 +187,7 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: "#6200ee",
+    backgroundColor: GlobalColors.primary,
   },
   cardItem: {
     flexDirection: "row",
@@ -198,7 +199,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   defaultCard: {
-    borderColor: "#6200ee",
+    borderColor: GlobalColors.primary,
     backgroundColor: "#f3e5ff",
   },
   cardIcon: {
@@ -219,7 +220,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   defaultBadge: {
-    color: "#6200ee",
+    color: GlobalColors.primary,
     fontSize: 12,
     fontWeight: "bold",
   },
@@ -231,7 +232,7 @@ const styles = StyleSheet.create({
   },
   addCardText: {
     marginLeft: 10,
-    color: "#6200ee",
+    color: GlobalColors.primary,
     fontWeight: "bold",
   },
   summary: {
@@ -256,7 +257,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   paymentButton: {
-    backgroundColor: "#6200ee",
+    backgroundColor: GlobalColors.primary,
     padding: 15,
     borderRadius: 5,
     alignItems: "center",

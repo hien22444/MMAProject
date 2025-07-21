@@ -14,6 +14,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { RootStackParamList, BottomTabParamList } from "../types/navigation";
 import Checkbox from "expo-checkbox";
+import GlobalColors from "../constants/colors";
 
 type CartScreenNavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<BottomTabParamList, "Cart">,
@@ -134,7 +135,7 @@ const CartScreen: React.FC = () => {
         <TouchableOpacity
           style={[
             styles.checkoutButton,
-            { backgroundColor: "#007bff", marginTop: 10 },
+            { backgroundColor: GlobalColors.primary, marginTop: 10 },
           ]}
           onPress={() =>
             navigation.navigate("Coupon", {

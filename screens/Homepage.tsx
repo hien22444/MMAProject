@@ -56,6 +56,18 @@ const Homepage: React.FC = () => {
       filterPrice(product.price)
   );
 
+  function formatSoldQuantity(quantity: number): string {
+    if (quantity >= 1_000_000) {
+      return `${(quantity / 1_000_000).toFixed(
+        quantity >= 10_000_000 ? 0 : 1
+      )}M+`;
+    } else if (quantity >= 1_000) {
+      return `${(quantity / 1_000).toFixed(quantity >= 10_000 ? 0 : 1)}K+`;
+    } else {
+      return quantity.toString();
+    }
+  }
+
   // Convert Product from context to old Product format for CardProduct
   const convertProduct = (product: any) => ({
     id: product.id,
@@ -63,7 +75,7 @@ const Homepage: React.FC = () => {
     price: `${product.price.toLocaleString()}₫`,
     image: { uri: product.imageUrl },
     describe: product.description,
-    sold: `${Math.floor(Math.random() * 50)}K`, // Random sold count
+    sold: formatSoldQuantity(product.sold),
   });
 
   return (
