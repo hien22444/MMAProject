@@ -4,14 +4,6 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import React from "react";
 import GlobalColors from "../../constants/colors";
 
-// id: string;
-//   content: string;
-//   senderType: "user" | "agent" | "system";
-//   senderId: string;
-//   timestamp: Date;
-//   status: "sent" | "delivered" | "read";
-//   isSystemMessage?: boolean;
-
 export default function ChatMessage({ message, isUserSender }: any) {
   const formattedTime = message.timestamp.toLocaleTimeString([], {
     hour: "2-digit",
@@ -19,10 +11,8 @@ export default function ChatMessage({ message, isUserSender }: any) {
   });
 
   let direction = "left";
-  if (
-    (isUserSender && message.senderType == "user") ||
-    (!isUserSender && message.senderType !== "user")
-  ) {
+
+  if (isUserSender) {
     direction = "right";
   }
 
@@ -40,10 +30,10 @@ export default function ChatMessage({ message, isUserSender }: any) {
             source={
               direction == "left"
                 ? {
-                    uri: "https://img.goodfon.com/wallpaper/big/3/1c/asian-girl-fei-photo-xin-xin-ksin-ksin-milaia-aziatka-vzgl-1.webp",
+                    uri: "https://media.istockphoto.com/id/1388642146/photo/call-center-workers.jpg?s=612x612&w=0&k=20&c=OQ-BhHBcXxYxK2zz4JUQXR6SJ1NucnaVjHWu8ylksNI=",
                   }
                 : {
-                    uri: "https://media.istockphoto.com/id/1388642146/photo/call-center-workers.jpg?s=612x612&w=0&k=20&c=OQ-BhHBcXxYxK2zz4JUQXR6SJ1NucnaVjHWu8ylksNI=",
+                    uri: "https://img.goodfon.com/wallpaper/big/3/1c/asian-girl-fei-photo-xin-xin-ksin-ksin-milaia-aziatka-vzgl-1.webp",
                   }
             }
           />
@@ -51,17 +41,46 @@ export default function ChatMessage({ message, isUserSender }: any) {
         <View
           style={[
             styles.info,
-            direction == "right" && { backgroundColor: GlobalColors.primary },
+            direction == "right" && {
+              backgroundColor: GlobalColors.primary,
+            },
           ]}
         >
-          <Text style={{ fontSize: 16, color: "#333" }}>{message.content}</Text>
-          <View style={styles.subinfo}>
-            <Text style={{ fontSize: 12, color: "#555" }}>{formattedTime}</Text>
-            <Text>
+          <Text
+            style={[
+              { fontSize: 16, color: "#333" },
+              direction == "right" && { color: "#fff" },
+            ]}
+          >
+            {message.content}
+          </Text>
+          <View style={styles.subInfo}>
+            <Text
+              style={[
+                { fontSize: 12, color: "#555" },
+                direction == "right" && { color: "#fff" },
+              ]}
+            >
+              {formattedTime}
+            </Text>
+            <Text
+              style={[
+                { fontSize: 12, color: "#555", marginLeft: 5 },
+                direction == "right" && { color: "#fff" },
+              ]}
+            >
               {message.status == "sent" ? (
-                <FontAwesome5 name="check-double" size={12} color="#555" />
+                <FontAwesome5
+                  name="check-double"
+                  size={12}
+                  color={direction == "right" ? "#fff" : "#555"}
+                />
               ) : message.status == "delivered" ? (
-                <FontAwesome6 name="clock" size={12} color="#555" />
+                <FontAwesome6
+                  name="clock"
+                  size={12}
+                  color={direction == "right" ? "#fff" : "#555"}
+                />
               ) : (
                 "đã xem"
               )}
@@ -99,7 +118,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
 
-  subinfo: {
+  subInfo: {
     marginTop: 5,
     flexDirection: "row",
     justifyContent: "space-between",

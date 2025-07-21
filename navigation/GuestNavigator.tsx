@@ -33,6 +33,7 @@ export default function GuestNavigator() {
         tabBarInactiveTintColor: "gray",
         headerShown: false,
       })}
+      initialRouteName="Home"
     >
       <Tab.Screen
         name="Home"

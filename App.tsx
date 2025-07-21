@@ -7,19 +7,22 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { ProductProvider } from "./contexts/ProductContext";
 import { OrderProvider } from "./contexts/OrderContext";
 import { ReviewProvider } from "./contexts/ReviewContext";
+import { MessageProvider } from "./contexts/ChatContext";
 
 export default function App() {
   return (
     <AuthProvider>
-      <ReviewProvider>
-        <ProductProvider>
-          <OrderProvider>
-            <CartProvider>
-              <RootNavigator />
-            </CartProvider>
-          </OrderProvider>
-        </ProductProvider>
-      </ReviewProvider>
+      <MessageProvider>
+        <ReviewProvider>
+          <ProductProvider>
+            <OrderProvider>
+              <CartProvider>
+                <RootNavigator />
+              </CartProvider>
+            </OrderProvider>
+          </ProductProvider>
+        </ReviewProvider>
+      </MessageProvider>
       <StatusBar style="auto" />
     </AuthProvider>
   );
