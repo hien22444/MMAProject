@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { Product } from "../types/product";
+import { Product as ContextProduct } from "../contexts/ProductContext";
 import DetailProduct from "../components/product/DetailProduct";
 import ReviewList from "../components/Review/ReviewList";
 import { useNavigation } from "@react-navigation/native";
@@ -16,6 +17,7 @@ import { RootStackParamList } from "../types/navigation";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import reviews from "../data/reviews";
+import { useProducts } from "../contexts/ProductContext";
 
 type ProductDetailRouteProp = RouteProp<
   { ProductDetail: { product: Product } },
@@ -31,11 +33,28 @@ const ProductDetail: React.FC<{
   route: ProductDetailRouteProp;
 }> = ({ route }) => {
   const navigation = useNavigation<ReviewScreenNavigationProp>();
-  const { product } = route.params;
+  const { product: productInfo } = route.params;
+  const [originProduct, setOriginProduct] = useState<
+    ContextProduct | undefined | null
+  >(null);
+
+  const { getProductById } = useProducts();
+
+  useEffect(() => {
+    const fetchOriginProduct = async () => {
+      const data = await getProductById(productInfo.id);
+      setOriginProduct(data);
+    };
+    fetchOriginProduct();
+  }, []);
+
+  if (!originProduct) {
+    return <Text>Loading...</Text>;
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <DetailProduct product={product} />
+      <DetailProduct product={originProduct} />
       <ReviewList
         reviews={reviews.filter((r) => r.productId === "1").slice(0, 2)}
       />
