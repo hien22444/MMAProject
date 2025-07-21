@@ -4,26 +4,45 @@ import BottomSheet from "../BottomSheet/BottomSheet";
 import Entypo from "@expo/vector-icons/Entypo";
 import GlobalColors from "../../constants/colors";
 import { useRoute } from "@react-navigation/native";
+import { useReviews } from "../../contexts/ReviewContext";
+import { useAuth } from "../../contexts/AuthContext";
+import { Review } from "../../types/review";
 
 export default function CreateReviewSheet({
   isModalOpen,
   setIsModalOpen,
+  productId,
 }: any) {
   const route = useRoute();
-  const productId = "123";
-  const userId = "123";
+  const { currentUser } = useAuth();
+  const { reviews, addReview } = useReviews();
 
-  const [newReview, setNewReview] = useState({
-    numStar: 0,
-    comment: "",
+  const [newReview, setNewReview] = useState<Review>({
+    id: (reviews?.length + 1).toString(),
     productId,
-    userId,
+    userId: currentUser?.id || "",
+    avatar: currentUser?.avatar || "",
+    fullname: currentUser?.fullName || "",
+    email: currentUser?.email || "",
+    createdAt: new Date().toLocaleDateString("vi-VN"),
+    numStar: 0,
+    maxStar: 5,
+    content: "",
   });
 
   const handleCreateReview = () => {
     console.log(newReview);
+    if (!newReview.content) {
+      alert("Please enter a comment");
+      return;
+    }
+    if (newReview.numStar === 0) {
+      alert("Please rate the product");
+      return;
+    }
+
     setIsModalOpen(false);
-    setNewReview({ numStar: 0, comment: "", productId, userId });
+    addReview(newReview);
   };
 
   return (
@@ -56,9 +75,9 @@ export default function CreateReviewSheet({
         numberOfLines={4}
         style={styles.comment}
         onChangeText={(text) =>
-          setNewReview((prev) => ({ ...prev, comment: text }))
+          setNewReview((prev) => ({ ...prev, content: text }))
         }
-        value={newReview.comment}
+        value={newReview.content}
         placeholder="Your review here..."
       />
 

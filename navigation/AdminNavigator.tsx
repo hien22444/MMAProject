@@ -1,12 +1,12 @@
-import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';
-import ProductManagementScreen from '../screens/ProductManagementScreen';
-import OrderManagementScreen from '../screens/OrderManagementScreen';
-import CategoryManagementScreen from '../screens/CategoryManagementScreen';
-import AnalyticsScreen from '../screens/AnalyticsScreen';
-import AdminUserManager from '../admin/AdminUserManager';
-import { AdminTabParamList } from '../types/navigation';
+import React from "react";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Ionicons } from "@expo/vector-icons";
+import ProductManagementScreen from "../screens/ProductManagementScreen";
+import OrderManagementScreen from "../screens/OrderManagementScreen";
+import CategoryManagementScreen from "../screens/CategoryManagementScreen";
+import AnalyticsScreen from "../screens/AnalyticsScreen";
+import AdminUserManager from "../admin/AdminUserManager";
+import { AdminTabParamList } from "../types/navigation";
 
 const Tab = createBottomTabNavigator<AdminTabParamList>();
 
@@ -14,8 +14,8 @@ export default function AdminNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: '#007bff',
-        tabBarInactiveTintColor: 'gray',
+        tabBarActiveTintColor: "#007bff",
+        tabBarInactiveTintColor: "gray",
         tabBarLabelStyle: {
           fontSize: 12,
         },
@@ -25,7 +25,7 @@ export default function AdminNavigator() {
         name="ProductManagement"
         component={ProductManagementScreen}
         options={{
-          title: 'Products',
+          title: "Products",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="cube-outline" size={size} color={color} />
           ),
@@ -35,7 +35,7 @@ export default function AdminNavigator() {
         name="OrderManagement"
         component={OrderManagementScreen}
         options={{
-          title: 'Orders',
+          title: "Orders",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="receipt-outline" size={size} color={color} />
           ),
@@ -45,7 +45,7 @@ export default function AdminNavigator() {
         name="CategoryManagement"
         component={CategoryManagementScreen}
         options={{
-          title: 'Categories',
+          title: "Categories",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="list-outline" size={size} color={color} />
           ),
@@ -55,7 +55,7 @@ export default function AdminNavigator() {
         name="Analytics"
         component={AnalyticsScreen}
         options={{
-          title: 'Analytics',
+          title: "Analytics",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="analytics-outline" size={size} color={color} />
           ),
@@ -65,7 +65,7 @@ export default function AdminNavigator() {
         name="UserManager"
         component={AdminUserManager}
         options={{
-          title: 'Users',
+          title: "Users",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="people-outline" size={size} color={color} />
           ),

@@ -21,6 +21,7 @@ export default function TabNavigator() {
           ),
         }}
       />
+
       <Tab.Screen
         name="Cart"
         component={CartScreen}

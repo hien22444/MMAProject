@@ -1,4 +1,5 @@
-import { Product } from '../contexts/ProductContext';
+import { Product } from "../contexts/ProductContext";
+import { Review } from "../types/review";
 
 export type RootStackParamList = {
   Tab: { screen: keyof BottomTabParamList } | undefined;
@@ -13,12 +14,6 @@ export type RootStackParamList = {
 
   OrderDetail: undefined;
 
-  Review: {
-    orderId?: string;
-    productId?: string;
-    productName?: string;
-  };
-
   Payment: { totalAmount: number };
 
   Coupon: { totalAmount: number };
@@ -29,6 +24,10 @@ export type RootStackParamList = {
   Checkout: undefined;
   Login: undefined;
   Register: undefined;
+
+  AllReviews: {
+    productId: string;
+  };
 
   ProductList: undefined;
   Search: undefined;

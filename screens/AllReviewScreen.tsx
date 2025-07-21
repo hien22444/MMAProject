@@ -1,68 +1,24 @@
 import { View, Text, FlatList, Pressable, StyleSheet } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ReviewBox from "../components/Review/ReviewBox";
 import CreateReviewSheet from "../components/CreateReview/CreateReviewSheet";
-const reviews = [
-  {
-    id: "1",
-    avatar: "",
-    fullname: "Nguyễn Sỹ Đức",
-    email: "ducns@gmail.com",
-    createdAt: "2025-10-23",
-    numStar: 4,
-    maxStar: 5,
-    content:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat",
-  },
-  {
-    id: "2",
-    avatar: "",
-    fullname: "Nguyễn Sỹ Đức",
-    email: "ducns@gmail.com",
-    createdAt: "2025-10-23",
-    numStar: 1,
-    maxStar: 5,
-    content:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat",
-  },
-  {
-    id: "3",
-    avatar: "",
-    fullname: "Nguyễn Sỹ Đức",
-    email: "ducns@gmail.com",
-    createdAt: "2025-10-23",
-    numStar: 5,
-    maxStar: 5,
-    content:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat",
-  },
-  {
-    id: "4",
-    avatar: "",
-    fullname: "Nguyễn Sỹ Đức",
-    email: "ducns@gmail.com",
-    createdAt: "2025-10-23",
-    numStar: 2,
-    maxStar: 5,
-    content:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat",
-  },
-  {
-    id: "5",
-    avatar: "",
-    fullname: "Nguyễn Sỹ Đức",
-    email: "ducns@gmail.com",
-    createdAt: "2025-10-23",
-    numStar: 3,
-    maxStar: 5,
-    content:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat",
-  },
-];
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../types/navigation";
+import { useReviews } from "../contexts/ReviewContext";
 
-export default function AllReviewScreen() {
+type AllReviewRouteProp = NativeStackScreenProps<
+  RootStackParamList,
+  "AllReviews"
+>;
+
+const AllReviewScreen: React.FC<AllReviewRouteProp> = ({
+  route,
+  navigation,
+}) => {
   const renderReview = ({ item }: any) => <ReviewBox {...item} />;
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const { reviews } = useReviews();
+  const { productId } = route.params || {};
 
   return (
     <>
@@ -80,7 +36,7 @@ export default function AllReviewScreen() {
 
         <View>
           <FlatList
-            data={reviews}
+            data={reviews.filter((r) => r.productId === productId).reverse()}
             keyExtractor={(item) => item.id.toString()}
             renderItem={renderReview}
           />
@@ -90,11 +46,12 @@ export default function AllReviewScreen() {
         <CreateReviewSheet
           isModalOpen={isModalOpen}
           setIsModalOpen={setIsModalOpen}
+          productId={productId}
         />
       )}
     </>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -126,3 +83,5 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
+
+export default AllReviewScreen;

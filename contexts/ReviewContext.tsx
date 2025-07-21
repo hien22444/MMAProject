@@ -1,18 +1,8 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
 import { reviews as initialReviews } from "../data/reviews";
+import { Review } from "../types/review";
 
 // Define Review type
-export interface Review {
-  id: string;
-  productId: string;
-  avatar: string;
-  fullname: string;
-  email: string;
-  createdAt: string;
-  numStar: number;
-  maxStar: number;
-  content: string;
-}
 
 interface ReviewContextType {
   reviews: Review[];

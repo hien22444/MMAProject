@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -9,21 +9,21 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useAuth } from '../contexts/AuthContext';
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useAuth } from "../contexts/AuthContext";
 
 type Props = NativeStackScreenProps<any>;
 
 export default function Register({ navigation }: Props) {
   const { register } = useAuth();
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
-    password: '',
-    confirmPassword: '',
+    fullName: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -34,31 +34,31 @@ export default function Register({ navigation }: Props) {
     const newErrors: { [key: string]: string } = {};
 
     if (!formData.fullName.trim()) {
-      newErrors.fullName = 'Vui lòng nhập họ tên';
+      newErrors.fullName = "Vui lòng nhập họ tên";
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = 'Vui lòng nhập email';
+      newErrors.email = "Vui lòng nhập email";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email không đúng định dạng';
+      newErrors.email = "Email không đúng định dạng";
     }
 
     if (!formData.phone.trim()) {
-      newErrors.phone = 'Vui lòng nhập số điện thoại';
+      newErrors.phone = "Vui lòng nhập số điện thoại";
     } else if (!/^0\d{9}$/.test(formData.phone)) {
-      newErrors.phone = 'Số điện thoại không hợp lệ';
+      newErrors.phone = "Số điện thoại không hợp lệ";
     }
 
     if (!formData.password) {
-      newErrors.password = 'Vui lòng nhập mật khẩu';
+      newErrors.password = "Vui lòng nhập mật khẩu";
     } else if (formData.password.length < 6) {
-      newErrors.password = 'Mật khẩu phải có ít nhất 6 ký tự';
+      newErrors.password = "Mật khẩu phải có ít nhất 6 ký tự";
     }
 
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Vui lòng xác nhận mật khẩu';
+      newErrors.confirmPassword = "Vui lòng xác nhận mật khẩu";
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Mật khẩu không khớp';
+      newErrors.confirmPassword = "Mật khẩu không khớp";
     }
 
     setErrors(newErrors);
@@ -72,41 +72,43 @@ export default function Register({ navigation }: Props) {
 
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      const success = register(formData.email, formData.password);
+      const success = register(
+        formData.fullName,
+        formData.email,
+        formData.phone,
+        formData.password
+      );
+
       if (success) {
-        Alert.alert(
-          'Thành công',
-          'Tài khoản đã được tạo thành công!',
-          [
-            {
-              text: 'Đăng nhập ngay',
-              onPress: () => navigation.navigate('Login')
-            }
-          ]
-        );
+        Alert.alert("Thành công", "Tài khoản đã được tạo thành công!", [
+          {
+            text: "Đăng nhập ngay",
+            onPress: () => navigation.navigate("Login"),
+          },
+        ]);
       } else {
-        Alert.alert('Lỗi', 'Email đã được sử dụng');
+        Alert.alert("Lỗi", "Email đã được sử dụng");
       }
     } catch (error) {
-      Alert.alert('Lỗi', 'Có lỗi xảy ra, vui lòng thử lại');
+      Alert.alert("Lỗi", "Có lỗi xảy ra, vui lòng thử lại");
     } finally {
       setIsLoading(false);
     }
   };
 
   const updateFormData = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {/* Header */}
@@ -135,60 +137,86 @@ export default function Register({ navigation }: Props) {
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Họ và tên</Text>
             <View style={styles.inputContainer}>
-              <Ionicons name="person-outline" size={20} color="#666" style={styles.inputIcon} />
+              <Ionicons
+                name="person-outline"
+                size={20}
+                color="#666"
+                style={styles.inputIcon}
+              />
               <TextInput
                 style={styles.input}
                 value={formData.fullName}
-                onChangeText={(value) => updateFormData('fullName', value)}
+                onChangeText={(value) => updateFormData("fullName", value)}
                 placeholder="Nhập họ và tên của bạn"
                 autoCapitalize="words"
               />
             </View>
-            {errors.fullName ? <Text style={styles.errorText}>{errors.fullName}</Text> : null}
+            {errors.fullName ? (
+              <Text style={styles.errorText}>{errors.fullName}</Text>
+            ) : null}
           </View>
 
           {/* Email */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Email</Text>
             <View style={styles.inputContainer}>
-              <Ionicons name="mail-outline" size={20} color="#666" style={styles.inputIcon} />
+              <Ionicons
+                name="mail-outline"
+                size={20}
+                color="#666"
+                style={styles.inputIcon}
+              />
               <TextInput
                 style={styles.input}
                 value={formData.email}
-                onChangeText={(value) => updateFormData('email', value)}
+                onChangeText={(value) => updateFormData("email", value)}
                 placeholder="Nhập địa chỉ email"
                 keyboardType="email-address"
                 autoCapitalize="none"
               />
             </View>
-            {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
+            {errors.email ? (
+              <Text style={styles.errorText}>{errors.email}</Text>
+            ) : null}
           </View>
 
           {/* Phone */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Số điện thoại</Text>
             <View style={styles.inputContainer}>
-              <Ionicons name="call-outline" size={20} color="#666" style={styles.inputIcon} />
+              <Ionicons
+                name="call-outline"
+                size={20}
+                color="#666"
+                style={styles.inputIcon}
+              />
               <TextInput
                 style={styles.input}
                 value={formData.phone}
-                onChangeText={(value) => updateFormData('phone', value)}
+                onChangeText={(value) => updateFormData("phone", value)}
                 placeholder="Nhập số điện thoại"
                 keyboardType="phone-pad"
               />
             </View>
-            {errors.phone ? <Text style={styles.errorText}>{errors.phone}</Text> : null}
+            {errors.phone ? (
+              <Text style={styles.errorText}>{errors.phone}</Text>
+            ) : null}
           </View>
 
           {/* Password */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Mật khẩu</Text>
             <View style={styles.inputContainer}>
-              <Ionicons name="lock-closed-outline" size={20} color="#666" style={styles.inputIcon} />
+              <Ionicons
+                name="lock-closed-outline"
+                size={20}
+                color="#666"
+                style={styles.inputIcon}
+              />
               <TextInput
                 style={styles.input}
                 value={formData.password}
-                onChangeText={(value) => updateFormData('password', value)}
+                onChangeText={(value) => updateFormData("password", value)}
                 placeholder="Nhập mật khẩu"
                 secureTextEntry={!showPassword}
               />
@@ -197,24 +225,33 @@ export default function Register({ navigation }: Props) {
                 onPress={() => setShowPassword(!showPassword)}
               >
                 <Ionicons
-                  name={showPassword ? 'eye-off' : 'eye'}
+                  name={showPassword ? "eye-off" : "eye"}
                   size={20}
                   color="#666"
                 />
               </TouchableOpacity>
             </View>
-            {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
+            {errors.password ? (
+              <Text style={styles.errorText}>{errors.password}</Text>
+            ) : null}
           </View>
 
           {/* Confirm Password */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Xác nhận mật khẩu</Text>
             <View style={styles.inputContainer}>
-              <Ionicons name="lock-closed-outline" size={20} color="#666" style={styles.inputIcon} />
+              <Ionicons
+                name="lock-closed-outline"
+                size={20}
+                color="#666"
+                style={styles.inputIcon}
+              />
               <TextInput
                 style={styles.input}
                 value={formData.confirmPassword}
-                onChangeText={(value) => updateFormData('confirmPassword', value)}
+                onChangeText={(value) =>
+                  updateFormData("confirmPassword", value)
+                }
                 placeholder="Nhập lại mật khẩu"
                 secureTextEntry={!showConfirmPassword}
               />
@@ -223,23 +260,30 @@ export default function Register({ navigation }: Props) {
                 onPress={() => setShowConfirmPassword(!showConfirmPassword)}
               >
                 <Ionicons
-                  name={showConfirmPassword ? 'eye-off' : 'eye'}
+                  name={showConfirmPassword ? "eye-off" : "eye"}
                   size={20}
                   color="#666"
                 />
               </TouchableOpacity>
             </View>
-            {errors.confirmPassword ? <Text style={styles.errorText}>{errors.confirmPassword}</Text> : null}
+            {errors.confirmPassword ? (
+              <Text style={styles.errorText}>{errors.confirmPassword}</Text>
+            ) : null}
           </View>
 
           {/* Register Button */}
           <TouchableOpacity
-            style={[styles.registerButton, isLoading && styles.registerButtonDisabled]}
+            style={[
+              styles.registerButton,
+              isLoading && styles.registerButtonDisabled,
+            ]}
             onPress={handleRegister}
             disabled={isLoading}
           >
             {isLoading ? (
-              <Text style={styles.registerButtonText}>Đang tạo tài khoản...</Text>
+              <Text style={styles.registerButtonText}>
+                Đang tạo tài khoản...
+              </Text>
             ) : (
               <Text style={styles.registerButtonText}>Đăng ký</Text>
             )}
@@ -248,7 +292,7 @@ export default function Register({ navigation }: Props) {
           {/* Login Link */}
           <View style={styles.loginSection}>
             <Text style={styles.loginText}>Đã có tài khoản? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
               <Text style={styles.loginLink}>Đăng nhập ngay</Text>
             </TouchableOpacity>
           </View>
@@ -257,9 +301,8 @@ export default function Register({ navigation }: Props) {
         {/* Terms */}
         <View style={styles.termsSection}>
           <Text style={styles.termsText}>
-            Bằng việc đăng ký, bạn đồng ý với{' '}
-            <Text style={styles.termsLink}>Điều khoản sử dụng</Text>
-            {' '}và{' '}
+            Bằng việc đăng ký, bạn đồng ý với{" "}
+            <Text style={styles.termsLink}>Điều khoản sử dụng</Text> và{" "}
             <Text style={styles.termsLink}>Chính sách bảo mật</Text>
           </Text>
         </View>
@@ -271,53 +314,53 @@ export default function Register({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   scrollContainer: {
     flexGrow: 1,
     paddingBottom: 20,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: "#eee",
   },
   backButton: {
     padding: 8,
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
   },
   placeholder: {
     width: 40,
   },
   welcomeSection: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingHorizontal: 20,
     paddingVertical: 30,
-    alignItems: 'center',
+    alignItems: "center",
   },
   welcomeTitle: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 10,
   },
   welcomeSubtitle: {
     fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
     lineHeight: 22,
   },
   formContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     marginTop: 10,
     paddingHorizontal: 20,
     paddingVertical: 20,
@@ -327,17 +370,17 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 8,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 12,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingHorizontal: 15,
   },
   inputIcon: {
@@ -347,47 +390,47 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 15,
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
   eyeButton: {
     padding: 8,
   },
   errorText: {
-    color: '#dc3545',
+    color: "#dc3545",
     fontSize: 14,
     marginTop: 5,
     marginLeft: 5,
   },
   registerButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: "#007bff",
     paddingVertical: 16,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 20,
     marginBottom: 20,
   },
   registerButtonDisabled: {
-    backgroundColor: '#ccc',
+    backgroundColor: "#ccc",
   },
   registerButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   loginSection: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 20,
   },
   loginText: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
   },
   loginLink: {
     fontSize: 16,
-    color: '#007bff',
-    fontWeight: '600',
+    color: "#007bff",
+    fontWeight: "600",
   },
   termsSection: {
     paddingHorizontal: 20,
@@ -395,12 +438,12 @@ const styles = StyleSheet.create({
   },
   termsText: {
     fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
     lineHeight: 20,
   },
   termsLink: {
-    color: '#007bff',
-    fontWeight: '500',
+    color: "#007bff",
+    fontWeight: "500",
   },
 });

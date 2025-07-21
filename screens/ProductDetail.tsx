@@ -1,44 +1,26 @@
 import React, { use, useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  FlatList,
-  Pressable,
-} from "react-native";
-import { RouteProp, useRoute } from "@react-navigation/native";
-import { Product } from "../types/product";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { Product as ContextProduct } from "../contexts/ProductContext";
 import DetailProduct from "../components/product/DetailProduct";
 import ReviewList from "../components/Review/ReviewList";
-import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../types/navigation";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-
-import reviews from "../data/reviews";
 import { useProducts } from "../contexts/ProductContext";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useReviews } from "../contexts/ReviewContext";
 
-type ProductDetailRouteProp = RouteProp<
-  { ProductDetail: { product: Product } },
+type ProductDetailProps = NativeStackScreenProps<
+  RootStackParamList,
   "ProductDetail"
 >;
 
-type ReviewScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "Review"
->;
-
-const ProductDetail: React.FC<{
-  route: ProductDetailRouteProp;
-}> = ({ route }) => {
-  const navigation = useNavigation<ReviewScreenNavigationProp>();
+const ProductDetail: React.FC<ProductDetailProps> = ({ route }) => {
   const { product: productInfo } = route.params;
   const [originProduct, setOriginProduct] = useState<
     ContextProduct | undefined | null
   >(null);
 
   const { getProductById } = useProducts();
+  const { reviews } = useReviews();
 
   useEffect(() => {
     const fetchOriginProduct = async () => {
@@ -56,32 +38,12 @@ const ProductDetail: React.FC<{
     <ScrollView contentContainerStyle={styles.container}>
       <DetailProduct product={originProduct} />
       <ReviewList
-        reviews={reviews.filter((r) => r.productId === "1").slice(0, 2)}
+        reviews={reviews
+          .filter((r) => r.productId === productInfo.id)
+          .reverse()
+          .splice(0, 2)}
+        productId={productInfo.id}
       />
-      <View
-        style={{
-          width: "100%",
-          alignItems: "flex-end",
-          justifyContent: "center",
-        }}
-      >
-        <Pressable
-          style={{
-            paddingVertical: 5,
-            paddingHorizontal: 10,
-            borderRadius: 5,
-          }}
-          android_ripple={{ color: "#FF6F61" }}
-          onPress={() => {
-            navigation.navigate("Review", {
-              productId: "sample-product",
-              productName: "Sản phẩm mẫu",
-            });
-          }}
-        >
-          <Text style={{ color: "#FF6F61" }}>Xem thêm đánh giá &gt;&gt;</Text>
-        </Pressable>
-      </View>
     </ScrollView>
   );
 };

@@ -1,5 +1,7 @@
-export type Review = {
+export interface Review {
   id: string;
+  productId: string;
+  userId: string;
   avatar: string;
   fullname: string;
   email: string;
@@ -7,4 +9,4 @@ export type Review = {
   numStar: number;
   maxStar: number;
   content: string;
-};
+}
