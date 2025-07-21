@@ -1,79 +1,46 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function ProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { currentUser, logout } = useAuth();
 
   const handlePress = (label: string) => {
-    // if (label === 'Danh sách yêu thích') {
-    //   navigation.navigate('Wishlist');
-    if (label === 'Đơn hàng của tôi') {
-      navigation.navigate('OrderHistory');
-    } else if (label === 'Địa chỉ giao hàng') {
-      navigation.navigate('ShippingAddress');
-    } else if (label === 'Cài đặt tài khoản') {
-      navigation.navigate('AccountSettings');
-    } else if (label === 'Trung tâm trợ giúp') {
-      navigation.navigate('HelpCenter');
-    } else if (label === 'Chính sách & Điều khoản') {
-      navigation.navigate('Policy');
-    } else if (label === 'Chỉnh sửa hồ sơ') {
-      navigation.navigate('MyProfile');
-    } else {
-      Alert.alert('Tính năng', `Bạn đã chọn: ${label}`);
+    switch (label) {
+      case 'Đơn hàng của tôi': navigation.navigate('OrderHistory'); break;
+      case 'Địa chỉ giao hàng': navigation.navigate('ShippingAddress'); break;
+      case 'Cài đặt tài khoản': navigation.navigate('AccountSettings'); break;
+      case 'Trung tâm trợ giúp': navigation.navigate('HelpCenter'); break;
+      case 'Chính sách & Điều khoản': navigation.navigate('Policy'); break;
+      case 'Chỉnh sửa hồ sơ': navigation.navigate('MyProfile'); break;
+      case 'Đăng xuất': logout(); break;
+      default: Alert.alert('Tính năng', `Bạn đã chọn: ${label}`);
     }
   };
 
   return (
     <ScrollView style={styles.container}>
-      {/* Thông tin người dùng */}
       <View style={styles.profileHeader}>
-        <Image
-          source={{
-            uri: 'https://img.freepik.com/premium-vector/male-face-avatar-icon-set-flat-design-social-media-profiles_1281173-3806.jpg?semt=ais_hybrid&w=740',
-          }}
-          style={styles.avatar}
-        />
-        <Text style={styles.name}>Nguyễn Văn A</Text>
-        <Text style={styles.info}>nguyenvana@gmail.com</Text>
-        <Text style={styles.info}>0909 123 456</Text>
-
+        <Image source={{ uri: 'https://img.freepik.com/free-icon/user_318-563642.jpg' }} style={styles.avatar} />
+        <Text style={styles.name}>{currentUser?.name || 'Chưa cập nhật'}</Text>
+        <Text style={styles.info}>{currentUser?.email}</Text>
+        <Text style={styles.info}>{currentUser?.phone}</Text>
         <View style={styles.actionRow}>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => handlePress('Chỉnh sửa hồ sơ')}
-          >
+          <TouchableOpacity style={styles.actionButton} onPress={() => handlePress('Chỉnh sửa hồ sơ')}>
             <Ionicons name="create-outline" size={20} color="#fff" />
-            {/* {renderItem('Chỉnh sửa hồ sơ', 'create-outline')} */}
             <Text style={styles.actionText}>Chỉnh sửa</Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => handlePress('Đổi mật khẩu')}
-          >
-            <Ionicons name="lock-closed-outline" size={20} color="#fff" />
-            <Text style={styles.actionText}>Đổi mật khẩu</Text>
-          </TouchableOpacity> */}
         </View>
       </View>
 
-      {/* Danh sách chức năng */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Tài khoản</Text>
         {renderItem('Đơn hàng của tôi', 'cube-outline')}
-        {/* {renderItem('Danh sách yêu thích', 'heart-outline')} */}
         {renderItem('Địa chỉ giao hàng', 'location-outline')}
       </View>
 
@@ -98,36 +65,12 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  profileHeader: {
-    alignItems: 'center',
-    paddingVertical: 30,
-    backgroundColor: '#f7f7f7',
-    marginBottom: 20,
-  },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 2,
-    borderColor: '#ccc',
-    marginBottom: 10,
-  },
-  name: {
-    fontSize: 22,
-    fontWeight: 'bold',
-  },
-  info: {
-    fontSize: 14,
-    color: '#666',
-  },
-  actionRow: {
-    flexDirection: 'row',
-    marginTop: 15,
-  },
+  container: { flex: 1, backgroundColor: '#fff' },
+  profileHeader: { alignItems: 'center', paddingVertical: 30, backgroundColor: '#f7f7f7', marginBottom: 20 },
+  avatar: { width: 100, height: 100, borderRadius: 50, borderWidth: 2, borderColor: '#ccc', marginBottom: 10 },
+  name: { fontSize: 22, fontWeight: 'bold' },
+  info: { fontSize: 14, color: '#666' },
+  actionRow: { flexDirection: 'row', marginTop: 15 },
   actionButton: {
     flexDirection: 'row',
     backgroundColor: '#007bff',
@@ -137,33 +80,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     alignItems: 'center',
   },
-  actionText: {
-    color: '#fff',
-    marginLeft: 6,
-    fontSize: 14,
-  },
-  section: {
-    paddingHorizontal: 20,
-    marginBottom: 25,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#444',
-    marginBottom: 10,
-  },
-  item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderColor: '#eee',
-  },
-  itemIcon: {
-    marginRight: 15,
-  },
-  itemLabel: {
-    fontSize: 16,
-    color: '#333',
-  },
+  actionText: { color: '#fff', marginLeft: 6, fontSize: 14 },
+  section: { paddingHorizontal: 20, marginBottom: 25 },
+  sectionTitle: { fontSize: 16, fontWeight: '600', color: '#444', marginBottom: 10 },
+  item: { flexDirection: 'row', alignItems: 'center', paddingVertical: 14, borderBottomWidth: 1, borderColor: '#eee' },
+  itemIcon: { marginRight: 15 },
+  itemLabel: { fontSize: 16, color: '#333' },
 });

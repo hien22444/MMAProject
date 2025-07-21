@@ -11,11 +11,21 @@ const Tab = createBottomTabNavigator<BottomTabParamList>();
 
 export default function TabNavigator() {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: "#4A00E0",
+        },
+        headerTintColor: "#fff",
+        headerTitleAlign: "center",
+        tabBarActiveTintColor: "#4A00E0",
+      }}
+    >
       <Tab.Screen
         name="Home"
         component={Homepage}
         options={{
+          title: "Trang chủ",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />
           ),
@@ -25,6 +35,7 @@ export default function TabNavigator() {
         name="Cart"
         component={CartScreen}
         options={{
+          title: "Giỏ hàng",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="cart-outline" size={size} color={color} />
           ),
@@ -34,6 +45,7 @@ export default function TabNavigator() {
         name="Chat"
         component={ChatScreen}
         options={{
+          title: "Trò chuyện",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="chatbubbles-outline" size={size} color={color} />
           ),
@@ -43,6 +55,7 @@ export default function TabNavigator() {
         name="Profile"
         component={ProfileScreen}
         options={{
+          title: "Trang cá nhân",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-outline" size={size} color={color} />
           ),
