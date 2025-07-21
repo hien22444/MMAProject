@@ -1,12 +1,18 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import { MaterialIcons as Icon } from "@expo/vector-icons";
-import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
+import { RouteProp, useRoute, useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from '../types/navigation';
-import { useCart } from '../contexts/CartContext';
+import { RootStackParamList } from "../types/navigation";
+import { useCart } from "../contexts/CartContext";
 
-type PaymentScreenRouteProp = RouteProp<RootStackParamList, 'Payment'>;
+type PaymentScreenRouteProp = RouteProp<RootStackParamList, "Payment">;
 type PaymentScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 type MaterialIconName =
@@ -32,7 +38,7 @@ const PaymentScreen = () => {
   const navigation = useNavigation<PaymentScreenNavigationProp>();
   const totalAmount = route.params.totalAmount; // Nhận từ CartScreen
   const [selectedMethod, setSelectedMethod] = useState("cod");
-  const { clearCart } = useCart();
+  const { clearCart, removeCoupon } = useCart();
   const shippingFee = 30000;
   const finalTotal = totalAmount + shippingFee;
 
@@ -112,14 +118,15 @@ const PaymentScreen = () => {
       </View>
 
       <TouchableOpacity
-  style={styles.paymentButton}
-  onPress={() => {
-    clearCart();
-    navigation.navigate('Tab', { screen: 'Home' }); 
-  }}
->
-  <Text style={styles.paymentButtonText}>Hoàn tất thanh toán</Text>
-</TouchableOpacity>
+        style={styles.paymentButton}
+        onPress={() => {
+          clearCart();
+          removeCoupon();
+          navigation.navigate("Tab", { screen: "Home" });
+        }}
+      >
+        <Text style={styles.paymentButtonText}>Hoàn tất thanh toán</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };

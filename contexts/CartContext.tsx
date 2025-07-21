@@ -1,5 +1,5 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { Product } from './ProductContext';
+import React, { createContext, useState, useContext, ReactNode } from "react";
+import { Product } from "./ProductContext";
 
 export interface CartItem extends Product {
   quantity: number; // Thêm quantity
@@ -8,7 +8,8 @@ export interface CartItem extends Product {
 interface CartContextType {
   cartItems: CartItem[];
   coupon: string;
-  setCoupon: (code: string) => void;
+  applyCoupon: (code: string) => void;
+  removeCoupon: () => void;
   addToCart: (product: Product) => void;
   removeFromCart: (id: string) => void;
   increaseQuantity: (id: string) => void;
@@ -24,13 +25,22 @@ interface CartProviderProps {
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [coupon, setCoupon] = useState<string>('');
+  const [coupon, setCoupon] = useState<string>("");
+
+  const applyCoupon = (code: string) => {
+    setCoupon(code);
+  };
+
+  const removeCoupon = () => {
+    setCoupon("");
+  };
+
   const addToCart = (product: Product) => {
     setCartItems((prevItems) => {
-      const existingItem = prevItems.find(item => item.id === product.id);
+      const existingItem = prevItems.find((item) => item.id === product.id);
       if (existingItem) {
         // Nếu đã có sp thì tăng quantity
-        return prevItems.map(item =>
+        return prevItems.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
@@ -43,12 +53,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   };
 
   const removeFromCart = (id: string) => {
-    setCartItems((prevItems) => prevItems.filter(item => item.id !== id));
+    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
   const increaseQuantity = (id: string) => {
     setCartItems((prevItems) =>
-      prevItems.map(item =>
+      prevItems.map((item) =>
         item.id === id ? { ...item, quantity: item.quantity + 1 } : item
       )
     );
@@ -56,7 +66,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   const decreaseQuantity = (id: string) => {
     setCartItems((prevItems) =>
-      prevItems.map(item =>
+      prevItems.map((item) =>
         item.id === id
           ? { ...item, quantity: item.quantity > 1 ? item.quantity - 1 : 1 } // không giảm dưới 1
           : item
@@ -69,16 +79,19 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   };
 
   return (
-    <CartContext.Provider value={{
-      cartItems,
-      coupon,
-      setCoupon,
-      addToCart,
-      removeFromCart,
-      increaseQuantity,
-      decreaseQuantity,
-      clearCart
-    }}>
+    <CartContext.Provider
+      value={{
+        cartItems,
+        coupon,
+        applyCoupon,
+        removeCoupon,
+        addToCart,
+        removeFromCart,
+        increaseQuantity,
+        decreaseQuantity,
+        clearCart,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
@@ -88,7 +101,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) {
-    throw new Error('useCart must be used within a CartProvider');
+    throw new Error("useCart must be used within a CartProvider");
   }
   return context;
 };

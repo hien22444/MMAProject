@@ -60,7 +60,7 @@ const list = [
 ];
 
 export default function CouponScreen({ navigation, route }: any) {
-  const { coupon, setCoupon } = useCart();
+  const { coupon, applyCoupon, removeCoupon } = useCart();
 
   const totalOrderValue = route.params.totalAmount;
   const handleComplete = () => {
@@ -69,7 +69,7 @@ export default function CouponScreen({ navigation, route }: any) {
         Number(selectedCoupon.discountValue.replace("%", ""))) /
       100;
 
-    setCoupon(discount.toString());
+    applyCoupon(discount.toString());
     navigation.goBack();
   };
 
