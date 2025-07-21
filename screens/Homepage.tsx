@@ -1,7 +1,14 @@
 import React, { useState } from "react";
-import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { Product } from "../types/product";
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import CardProduct from "../components/product/CardProduct";
 import Header from "../components/Header";
@@ -18,33 +25,35 @@ type RootStackParamList = {
 };
 
 const Homepage: React.FC = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { products, getFeaturedProducts } = useProducts();
   const { currentUser } = useAuth();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [priceFilter, setPriceFilter] = useState<string | null>(null);
 
   // Debug logs
-  console.log('Homepage - Total products:', products.length);
-  console.log('Homepage - First few products:', products.slice(0, 3));
+  console.log("Homepage - Total products:", products.length);
+  console.log("Homepage - First few products:", products.slice(0, 3));
 
   // Get featured categories from products
   const getUniqueCategories = () => {
-    const categories = [...new Set(products.map(p => p.category))];
+    const categories = [...new Set(products.map((p) => p.category))];
     return categories.slice(0, 6); // Take first 6 categories
   };
 
   const filterPrice = (price: number) => {
-    if (priceFilter === '<300') return price < 300000;
-    if (priceFilter === '>=300') return price >= 300000;
+    if (priceFilter === "<300") return price < 300000;
+    if (priceFilter === ">=300") return price >= 300000;
     return true;
   };
 
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-    (selectedCategory ? product.category === selectedCategory : true) &&
-    filterPrice(product.price)
+  const filteredProducts = products.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      (selectedCategory ? product.category === selectedCategory : true) &&
+      filterPrice(product.price)
   );
 
   // Convert Product from context to old Product format for CardProduct
@@ -54,7 +63,7 @@ const Homepage: React.FC = () => {
     price: `${product.price.toLocaleString()}₫`,
     image: { uri: product.imageUrl },
     describe: product.description,
-    sold: `${Math.floor(Math.random() * 50)}K` // Random sold count
+    sold: `${Math.floor(Math.random() * 50)}K`, // Random sold count
   });
 
   return (
@@ -66,17 +75,19 @@ const Homepage: React.FC = () => {
         <View style={styles.loginBanner}>
           <View style={styles.loginBannerContent}>
             <Text style={styles.loginBannerTitle}>Đăng nhập để mua hàng</Text>
-            <Text style={styles.loginBannerSubtitle}>Truy cập đầy đủ tính năng và ưu đãi</Text>
+            <Text style={styles.loginBannerSubtitle}>
+              Truy cập đầy đủ tính năng và ưu đãi
+            </Text>
             <View style={styles.loginBannerButtons}>
               <TouchableOpacity
                 style={styles.loginButton}
-                onPress={() => navigation.navigate('Login')}
+                onPress={() => navigation.navigate("Login")}
               >
                 <Text style={styles.loginButtonText}>Đăng nhập</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.registerButton}
-                onPress={() => navigation.navigate('Register')}
+                onPress={() => navigation.navigate("Register")}
               >
                 <Text style={styles.registerButtonText}>Đăng ký</Text>
               </TouchableOpacity>
@@ -93,14 +104,19 @@ const Homepage: React.FC = () => {
           horizontal
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => {
-            const categoryProduct = products.find(p => p.category === item);
+            const categoryProduct = products.find((p) => p.category === item);
             return (
               <TouchableOpacity
                 style={styles.categoryItem}
-                onPress={() => setSelectedCategory(selectedCategory === item ? null : item)}
+                onPress={() =>
+                  setSelectedCategory(selectedCategory === item ? null : item)
+                }
               >
                 {categoryProduct && (
-                  <Image source={{ uri: categoryProduct.imageUrl }} style={styles.categoryImage} />
+                  <Image
+                    source={{ uri: categoryProduct.imageUrl }}
+                    style={styles.categoryImage}
+                  />
                 )}
                 <Text style={styles.categoryText}>{item}</Text>
               </TouchableOpacity>
@@ -114,20 +130,32 @@ const Homepage: React.FC = () => {
       <View style={styles.filterContainer}>
         <Text style={styles.filterTitle}>Danh mục:</Text>
         <TouchableOpacity
-          style={[styles.filterButton, !selectedCategory && styles.activeFilter]}
+          style={[
+            styles.filterButton,
+            !selectedCategory && styles.activeFilter,
+          ]}
           onPress={() => setSelectedCategory(null)}
         >
           <Text>Tất cả</Text>
         </TouchableOpacity>
-        {getUniqueCategories().slice(0, 3).map(category => (
-          <TouchableOpacity
-            key={category}
-            style={[styles.filterButton, selectedCategory === category && styles.activeFilter]}
-            onPress={() => setSelectedCategory(selectedCategory === category ? null : category)}
-          >
-            <Text>{category}</Text>
-          </TouchableOpacity>
-        ))}
+        {getUniqueCategories()
+          .slice(0, 3)
+          .map((category) => (
+            <TouchableOpacity
+              key={category}
+              style={[
+                styles.filterButton,
+                selectedCategory === category && styles.activeFilter,
+              ]}
+              onPress={() =>
+                setSelectedCategory(
+                  selectedCategory === category ? null : category
+                )
+              }
+            >
+              <Text>{category}</Text>
+            </TouchableOpacity>
+          ))}
       </View>
 
       {/* Price Filter */}
@@ -140,16 +168,24 @@ const Homepage: React.FC = () => {
           <Text>Tất cả</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.filterButton, priceFilter === '<300' && styles.activeFilter]}
-          onPress={() => setPriceFilter(priceFilter === '<300' ? null : '<300')}
+          style={[
+            styles.filterButton,
+            priceFilter === "<300" && styles.activeFilter,
+          ]}
+          onPress={() => setPriceFilter(priceFilter === "<300" ? null : "<300")}
         >
-          <Text>{'< 300K'}</Text>
+          <Text>{"< 300K"}</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.filterButton, priceFilter === '>=300' && styles.activeFilter]}
-          onPress={() => setPriceFilter(priceFilter === '>=300' ? null : '>=300')}
+          style={[
+            styles.filterButton,
+            priceFilter === ">=300" && styles.activeFilter,
+          ]}
+          onPress={() =>
+            setPriceFilter(priceFilter === ">=300" ? null : ">=300")
+          }
         >
-          <Text>{'>= 300K'}</Text>
+          <Text>{">= 300K"}</Text>
         </TouchableOpacity>
       </View>
 
@@ -158,7 +194,7 @@ const Homepage: React.FC = () => {
         data={filteredProducts}
         keyExtractor={(item) => item.id}
         numColumns={2}
-        columnWrapperStyle={{ justifyContent: 'space-between' }}
+        columnWrapperStyle={{ justifyContent: "space-between" }}
         contentContainerStyle={{ paddingBottom: 20 }}
         renderItem={({ item }) => (
           <CardProduct product={convertProduct(item)} />
@@ -177,7 +213,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    backgroundColor: '#f5f5f5'
+    backgroundColor: "#f5f5f5",
   },
 
   categoryContainer: {
@@ -185,9 +221,9 @@ const styles = StyleSheet.create({
   },
 
   categoryItem: {
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
     marginRight: 10,
     padding: 10,
     borderRadius: 10,
@@ -205,98 +241,98 @@ const styles = StyleSheet.create({
 
   categoryText: {
     fontSize: 10,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#333',
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "#333",
   },
 
   filterContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 8,
-    flexWrap: 'wrap',
+    flexWrap: "wrap",
   },
 
   filterTitle: {
-    fontWeight: 'bold',
-    marginRight: 5
+    fontWeight: "bold",
+    marginRight: 5,
   },
 
   filterButton: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 15,
     marginHorizontal: 3,
     marginVertical: 2,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
   },
 
   activeFilter: {
-    backgroundColor: '#90D7FF',
-    borderColor: '#90D7FF',
+    backgroundColor: "#90D7FF",
+    borderColor: "#90D7FF",
   },
 
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingTop: 50,
   },
 
   emptyText: {
     fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
   },
   loginBanner: {
-    backgroundColor: '#007bff',
+    backgroundColor: "#007bff",
     marginBottom: 15,
     borderRadius: 10,
     padding: 15,
   },
   loginBannerContent: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   loginBannerTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: "bold",
+    color: "#fff",
     marginBottom: 5,
   },
   loginBannerSubtitle: {
     fontSize: 14,
-    color: '#e3f2fd',
+    color: "#e3f2fd",
     marginBottom: 15,
-    textAlign: 'center',
+    textAlign: "center",
   },
   loginBannerButtons: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 10,
   },
   loginButton: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
   },
   loginButtonText: {
-    color: '#007bff',
-    fontWeight: 'bold',
+    color: "#007bff",
+    fontWeight: "bold",
     fontSize: 14,
   },
   registerButton: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#fff',
+    borderColor: "#fff",
   },
   registerButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
     fontSize: 14,
   },
 });

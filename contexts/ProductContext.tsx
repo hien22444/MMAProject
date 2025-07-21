@@ -1,5 +1,5 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { products as initialProducts } from '../data/products';
+import React, { createContext, useState, useContext, ReactNode } from "react";
+import { products as initialProducts } from "../data/products";
 
 // Define Product type
 export interface Product {
@@ -10,6 +10,7 @@ export interface Product {
   imageUrl: string;
   category: string;
   inStock: number;
+  sold: number;
   rating: number;
   brand: string;
   colors: string[];
@@ -34,49 +35,53 @@ interface ProductProviderProps {
   children: ReactNode;
 }
 
-export const ProductProvider: React.FC<ProductProviderProps> = ({ children }) => {
+export const ProductProvider: React.FC<ProductProviderProps> = ({
+  children,
+}) => {
   const [products, setProducts] = useState<Product[]>(initialProducts);
 
   const addProduct = (product: Product) => {
-    setProducts(prevProducts => [...prevProducts, product]);
+    setProducts((prevProducts) => [...prevProducts, product]);
   };
 
   const updateProduct = (updatedProduct: Product) => {
-    setProducts(prevProducts => 
-      prevProducts.map(product => 
+    setProducts((prevProducts) =>
+      prevProducts.map((product) =>
         product.id === updatedProduct.id ? updatedProduct : product
       )
     );
   };
 
   const deleteProduct = (productId: string) => {
-    setProducts(prevProducts => 
-      prevProducts.filter(product => product.id !== productId)
+    setProducts((prevProducts) =>
+      prevProducts.filter((product) => product.id !== productId)
     );
   };
 
   const getFeaturedProducts = () => {
-    return products.filter(product => product.isFeatured);
+    return products.filter((product) => product.isFeatured);
   };
 
   const getProductsByCategory = (category: string) => {
-    return products.filter(product => product.category === category);
+    return products.filter((product) => product.category === category);
   };
 
   const getProductById = (id: string) => {
-    return products.find(product => product.id === id);
+    return products.find((product) => product.id === id);
   };
 
   return (
-    <ProductContext.Provider value={{
-      products,
-      addProduct,
-      updateProduct,
-      deleteProduct,
-      getFeaturedProducts,
-      getProductsByCategory,
-      getProductById
-    }}>
+    <ProductContext.Provider
+      value={{
+        products,
+        addProduct,
+        updateProduct,
+        deleteProduct,
+        getFeaturedProducts,
+        getProductsByCategory,
+        getProductById,
+      }}
+    >
       {children}
     </ProductContext.Provider>
   );
@@ -86,7 +91,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({ children }) =>
 export const useProducts = () => {
   const context = useContext(ProductContext);
   if (!context) {
-    throw new Error('useProducts must be used within a ProductProvider');
+    throw new Error("useProducts must be used within a ProductProvider");
   }
   return context;
 };
