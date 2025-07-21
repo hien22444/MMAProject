@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, Image } from "react-native";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import React from "react";
+import GlobalColors from "../../constants/colors";
 
 // id: string;
 //   content: string;
@@ -47,7 +48,12 @@ export default function ChatMessage({ message, isUserSender }: any) {
             }
           />
         </View>
-        <View style={styles.info}>
+        <View
+          style={[
+            styles.info,
+            direction == "right" && { backgroundColor: GlobalColors.primary },
+          ]}
+        >
           <Text style={{ fontSize: 16, color: "#333" }}>{message.content}</Text>
           <View style={styles.subinfo}>
             <Text style={{ fontSize: 12, color: "#555" }}>{formattedTime}</Text>
