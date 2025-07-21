@@ -74,12 +74,19 @@ export default function RootNavigator() {
               options={{ title: "Đăng ký" }}
             />
 
-            <Stack.Screen name="ProductDetail" component={ProductDetail} />
             <Stack.Screen
               name="ProductList"
               component={ProductListScreen}
               options={{ title: "Danh sách sản phẩm" }}
             />
+            {currentUser && (
+              <Stack.Screen
+                name="ProductDetail"
+                component={ProductDetail}
+                options={{ title: "Chi tiết" }}
+              />
+            )}
+
             <Stack.Screen
               name="AllReviews"
               component={AllReviewScreen}
@@ -133,7 +140,11 @@ export default function RootNavigator() {
               component={AdminNavigator}
               options={{ headerShown: false, title: "Admin Dashboard" }}
             />
-            <Stack.Screen name="ProductDetail" component={ProductDetail} />
+            <Stack.Screen
+              name="ProductDetail"
+              component={ProductDetail}
+              options={{ title: "Chi tiết" }}
+            />
             <Stack.Screen
               name="AllReviews"
               component={AllReviewScreen}
@@ -170,7 +181,11 @@ export default function RootNavigator() {
               component={AccountSettingsScreen}
             />
             <Stack.Screen name="HelpCenter" component={HelpCenterScreen} />
-            <Stack.Screen name="ProductDetail" component={ProductDetail} />
+            <Stack.Screen
+              name="ProductDetail"
+              component={ProductDetail}
+              options={{ title: "Chi tiết" }}
+            />
             <Stack.Screen
               name="ProductList"
               component={ProductListScreen}

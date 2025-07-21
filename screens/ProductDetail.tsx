@@ -51,6 +51,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ route }) => {
 
 const styles = StyleSheet.create({
   container: {
+    flexGrow: 1,
     padding: 15,
     paddingBottom: 30,
     backgroundColor: "#fff",
