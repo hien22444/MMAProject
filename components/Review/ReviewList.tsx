@@ -61,7 +61,7 @@ const ReviewList: React.FC<ReviewListProps> = ({ reviews, productId }) => {
           }}
         >
           <Text style={{ color: "#FF6F61" }}>
-            {reviews.length > 0 ? "Xem thêm đánh giá " : "Đánh giá "}&gt;&gt;
+            {reviews.length > 0 ? "Xem thêm đánh giá" : "Đánh giá "}&gt;&gt;
           </Text>
         </Pressable>
       </View>

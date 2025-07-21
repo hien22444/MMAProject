@@ -5,6 +5,7 @@ import CreateReviewSheet from "../components/CreateReview/CreateReviewSheet";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/navigation";
 import { useReviews } from "../contexts/ReviewContext";
+import { useAuth } from "../contexts/AuthContext";
 
 type AllReviewRouteProp = NativeStackScreenProps<
   RootStackParamList,
@@ -19,6 +20,7 @@ const AllReviewScreen: React.FC<AllReviewRouteProp> = ({
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const { reviews } = useReviews();
   const { productId } = route.params || {};
+  const { currentUser } = useAuth();
 
   return (
     <>
@@ -28,7 +30,10 @@ const AllReviewScreen: React.FC<AllReviewRouteProp> = ({
         <View style={styles.buttonContainer}>
           <Pressable
             style={styles.buttonInnerContainer}
-            onPress={() => setIsModalOpen(true)}
+            onPress={() => {
+              if (!currentUser) return navigation.navigate("Login");
+              setIsModalOpen(true);
+            }}
           >
             <Text style={styles.buttonText}>Create Review</Text>
           </Pressable>

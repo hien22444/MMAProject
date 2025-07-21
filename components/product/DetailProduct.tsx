@@ -12,6 +12,7 @@ import { useCart } from "../../contexts/CartContext";
 import { Product } from "../../contexts/ProductContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types/navigation";
+import { useAuth } from "../../contexts/AuthContext";
 
 type ProductDetailRouteProp = RouteProp<
   { ProductDetail: { product: Product } },
@@ -23,6 +24,7 @@ const DetailProduct: React.FC<{ product: Product }> = ({ product }) => {
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { params } = useRoute<ProductDetailRouteProp>();
   const { addToCart } = useCart();
+  const { currentUser } = useAuth();
 
   function formatSoldQuantity(quantity: number): string {
     if (quantity >= 1_000_000) {
@@ -50,7 +52,13 @@ const DetailProduct: React.FC<{ product: Product }> = ({ product }) => {
       <View style={styles.buttonRow}>
         <TouchableOpacity
           style={styles.addToCartButton}
-          onPress={() => addToCart(product)}
+          onPress={() => {
+            if (!currentUser) {
+              navigation.navigate("Login");
+              return;
+            }
+            addToCart(product);
+          }}
         >
           <Text style={styles.addToCartText}>Thêm Vào Giỏ</Text>
         </TouchableOpacity>
@@ -58,6 +66,10 @@ const DetailProduct: React.FC<{ product: Product }> = ({ product }) => {
         <TouchableOpacity
           style={styles.buyNowButton}
           onPress={() => {
+            if (!currentUser) {
+              navigation.navigate("Login");
+              return;
+            }
             addToCart(product);
             navigation.navigate("Tab", { screen: "Cart" });
           }}

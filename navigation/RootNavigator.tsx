@@ -76,6 +76,11 @@ export default function RootNavigator() {
               options={{ title: "Danh sách sản phẩm" }}
             />
             <Stack.Screen
+              name="AllReviews"
+              component={AllReviewScreen}
+              options={{ title: "Đánh giá" }}
+            />
+            <Stack.Screen
               name="Search"
               component={SearchScreen}
               options={{ title: "Tìm kiếm" }}
@@ -124,6 +129,11 @@ export default function RootNavigator() {
               options={{ headerShown: false, title: "Admin Dashboard" }}
             />
             <Stack.Screen name="ProductDetail" component={ProductDetail} />
+            <Stack.Screen
+              name="AllReviews"
+              component={AllReviewScreen}
+              options={{ title: "Đánh giá" }}
+            />
             <Stack.Screen
               name="ProductList"
               component={ProductListScreen}
