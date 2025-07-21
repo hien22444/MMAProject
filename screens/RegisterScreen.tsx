@@ -13,8 +13,9 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useAuth } from "../contexts/AuthContext";
+import { RootStackParamList } from "../types/navigation";
 
-type Props = NativeStackScreenProps<any>;
+type Props = NativeStackScreenProps<RootStackParamList, "Register">;
 
 export default function Register({ navigation }: Props) {
   const { register } = useAuth();
@@ -112,7 +113,7 @@ export default function Register({ navigation }: Props) {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {/* Header */}
-        <View style={styles.header}>
+        {/* <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => navigation.goBack()}
@@ -121,7 +122,7 @@ export default function Register({ navigation }: Props) {
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Đăng ký tài khoản</Text>
           <View style={styles.placeholder} />
-        </View>
+        </View> */}
 
         {/* Welcome Section */}
         <View style={styles.welcomeSection}>

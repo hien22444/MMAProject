@@ -15,6 +15,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 // Import ProductContext thay vì data trực tiếp
 import { useProducts, Product } from "../contexts/ProductContext";
 import { RootStackParamList } from "../types/navigation";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // Dữ liệu mẫu tìm kiếm gần đây
 const recentSearches = [
@@ -126,133 +127,139 @@ const SearchScreen = () => {
   );
 
   return (
-    <View style={styles.container}>
-      {/* Thanh tìm kiếm */}
-      <View style={styles.searchBarContainer}>
-        <View style={styles.searchBar}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Tìm kiếm sản phẩm..."
-            value={searchQuery}
-            onChangeText={handleSearch}
-            onSubmitEditing={handleSubmitSearch}
-            returnKeyType="search"
-            autoFocus
-          />
-
-          {searchQuery.length > 0 && (
-            <TouchableOpacity
-              style={styles.clearButton}
-              onPress={() => handleSearch("")}
-            >
-              <Text style={styles.clearButtonText}>×</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-
-        <TouchableOpacity
-          style={styles.searchButton}
-          onPress={handleSubmitSearch}
-        >
-          <Text style={styles.searchButtonText}>Tìm</Text>
-        </TouchableOpacity>
-      </View>
-
-      {isSearching ? (
-        <View style={styles.searchResultsContainer}>
-          <Text style={styles.resultsTitle}>
-            Kết quả tìm kiếm ({searchResults.length})
-          </Text>
-
-          {searchResults.length > 0 ? (
-            <FlatList
-              data={searchResults}
-              renderItem={renderSearchResultItem}
-              keyExtractor={(item) => item.id}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.searchResultsList}
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        {/* Thanh tìm kiếm */}
+        <View style={styles.searchBarContainer}>
+          <View style={styles.searchBar}>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Tìm kiếm sản phẩm..."
+              value={searchQuery}
+              onChangeText={handleSearch}
+              onSubmitEditing={handleSubmitSearch}
+              returnKeyType="search"
+              autoFocus
             />
-          ) : (
-            <View style={styles.noResultsContainer}>
-              <Text style={styles.noResultsText}>
-                Không tìm thấy sản phẩm nào phù hợp với từ khóa "{searchQuery}"
-              </Text>
-              <TouchableOpacity style={styles.suggestButton} onPress={() => {}}>
-                <Text style={styles.suggestButtonText}>Đề xuất sản phẩm</Text>
+
+            {searchQuery.length > 0 && (
+              <TouchableOpacity
+                style={styles.clearButton}
+                onPress={() => handleSearch("")}
+              >
+                <Text style={styles.clearButtonText}>×</Text>
               </TouchableOpacity>
-            </View>
-          )}
+            )}
+          </View>
+
+          <TouchableOpacity
+            style={styles.searchButton}
+            onPress={handleSubmitSearch}
+          >
+            <Text style={styles.searchButtonText}>Tìm</Text>
+          </TouchableOpacity>
         </View>
-      ) : (
-        <ScrollView style={styles.searchSuggestionsContainer}>
-          {/* Tìm kiếm gần đây */}
-          {recentSearchList.length > 0 && (
+
+        {isSearching ? (
+          <View style={styles.searchResultsContainer}>
+            <Text style={styles.resultsTitle}>
+              Kết quả tìm kiếm ({searchResults.length})
+            </Text>
+
+            {searchResults.length > 0 ? (
+              <FlatList
+                data={searchResults}
+                renderItem={renderSearchResultItem}
+                keyExtractor={(item) => item.id}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.searchResultsList}
+              />
+            ) : (
+              <View style={styles.noResultsContainer}>
+                <Text style={styles.noResultsText}>
+                  Không tìm thấy sản phẩm nào phù hợp với từ khóa "{searchQuery}
+                  "
+                </Text>
+                <TouchableOpacity
+                  style={styles.suggestButton}
+                  onPress={() => {}}
+                >
+                  <Text style={styles.suggestButtonText}>Đề xuất sản phẩm</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        ) : (
+          <ScrollView style={styles.searchSuggestionsContainer}>
+            {/* Tìm kiếm gần đây */}
+            {recentSearchList.length > 0 && (
+              <View style={styles.section}>
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionTitle}>Tìm kiếm gần đây</Text>
+                  <TouchableOpacity onPress={handleClearRecentSearches}>
+                    <Text style={styles.clearAllText}>Xóa tất cả</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.keywordsList}>
+                  {recentSearchList.map((keyword, index) => (
+                    <View key={index} style={styles.keywordContainer}>
+                      <TouchableOpacity
+                        style={styles.keyword}
+                        onPress={() => handleKeywordPress(keyword)}
+                      >
+                        <Text style={styles.keywordText}>{keyword}</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={styles.removeKeywordButton}
+                        onPress={() => handleRemoveRecentSearch(keyword)}
+                      >
+                        <Text style={styles.removeKeywordText}>×</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {/* Từ khóa phổ biến */}
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Tìm kiếm gần đây</Text>
-                <TouchableOpacity onPress={handleClearRecentSearches}>
-                  <Text style={styles.clearAllText}>Xóa tất cả</Text>
-                </TouchableOpacity>
+                <Text style={styles.sectionTitle}>Từ khóa phổ biến</Text>
               </View>
 
               <View style={styles.keywordsList}>
-                {recentSearchList.map((keyword, index) => (
-                  <View key={index} style={styles.keywordContainer}>
-                    <TouchableOpacity
-                      style={styles.keyword}
-                      onPress={() => handleKeywordPress(keyword)}
-                    >
-                      <Text style={styles.keywordText}>{keyword}</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={styles.removeKeywordButton}
-                      onPress={() => handleRemoveRecentSearch(keyword)}
-                    >
-                      <Text style={styles.removeKeywordText}>×</Text>
-                    </TouchableOpacity>
-                  </View>
+                {popularKeywords.map((keyword, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.keyword}
+                    onPress={() => handleKeywordPress(keyword)}
+                  >
+                    <Text style={styles.keywordText}>{keyword}</Text>
+                  </TouchableOpacity>
                 ))}
               </View>
             </View>
-          )}
 
-          {/* Từ khóa phổ biến */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Từ khóa phổ biến</Text>
+            {/* Đề xuất sản phẩm */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Có thể bạn sẽ thích</Text>
+
+              <FlatList
+                data={products
+                  .filter((product: Product) => product.isFeatured)
+                  .slice(0, 5)}
+                renderItem={renderSearchResultItem}
+                keyExtractor={(item) => item.id}
+                scrollEnabled={false}
+                contentContainerStyle={styles.suggestedProducts}
+              />
             </View>
-
-            <View style={styles.keywordsList}>
-              {popularKeywords.map((keyword, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.keyword}
-                  onPress={() => handleKeywordPress(keyword)}
-                >
-                  <Text style={styles.keywordText}>{keyword}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-
-          {/* Đề xuất sản phẩm */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Có thể bạn sẽ thích</Text>
-
-            <FlatList
-              data={products
-                .filter((product: Product) => product.isFeatured)
-                .slice(0, 5)}
-              renderItem={renderSearchResultItem}
-              keyExtractor={(item) => item.id}
-              scrollEnabled={false}
-              contentContainerStyle={styles.suggestedProducts}
-            />
-          </View>
-        </ScrollView>
-      )}
-    </View>
+          </ScrollView>
+        )}
+      </View>
+    </SafeAreaView>
   );
 };
 

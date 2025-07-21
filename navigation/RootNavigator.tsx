@@ -66,9 +66,14 @@ export default function RootNavigator() {
             <Stack.Screen
               name="Login"
               component={LoginScreen}
-              options={{ headerShown: false }}
+              options={{ title: "Đăng nhập" }}
             />
-            <Stack.Screen name="Register" component={RegisterScreen} />
+            <Stack.Screen
+              name="Register"
+              component={RegisterScreen}
+              options={{ title: "Đăng ký" }}
+            />
+
             <Stack.Screen name="ProductDetail" component={ProductDetail} />
             <Stack.Screen
               name="ProductList"

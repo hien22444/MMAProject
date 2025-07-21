@@ -14,15 +14,8 @@ import CardProduct from "../components/product/CardProduct";
 import Header from "../components/Header";
 import { useProducts } from "../contexts/ProductContext";
 import { useAuth } from "../contexts/AuthContext";
-
-type RootStackParamList = {
-  Home: undefined;
-  ProductDetail: { product: Product };
-  Cart: undefined;
-  Profile: undefined;
-  Login: undefined;
-  Register: undefined;
-};
+import { RootStackParamList } from "../types/navigation";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Homepage: React.FC = () => {
   const navigation =
@@ -79,145 +72,149 @@ const Homepage: React.FC = () => {
   });
 
   return (
-    <View style={styles.container}>
-      <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
-      {/* Login Banner for Guests */}
-      {!currentUser && (
-        <View style={styles.loginBanner}>
-          <View style={styles.loginBannerContent}>
-            <Text style={styles.loginBannerTitle}>Đăng nhập để mua hàng</Text>
-            <Text style={styles.loginBannerSubtitle}>
-              Truy cập đầy đủ tính năng và ưu đãi
-            </Text>
-            <View style={styles.loginBannerButtons}>
-              <TouchableOpacity
-                style={styles.loginButton}
-                onPress={() => navigation.navigate("Login")}
-              >
-                <Text style={styles.loginButtonText}>Đăng nhập</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.registerButton}
-                onPress={() => navigation.navigate("Register")}
-              >
-                <Text style={styles.registerButtonText}>Đăng ký</Text>
-              </TouchableOpacity>
+        {/* Login Banner for Guests */}
+        {!currentUser && (
+          <View style={styles.loginBanner}>
+            <View style={styles.loginBannerContent}>
+              <Text style={styles.loginBannerTitle}>Đăng nhập để mua hàng</Text>
+              <Text style={styles.loginBannerSubtitle}>
+                Truy cập đầy đủ tính năng và ưu đãi
+              </Text>
+              <View style={styles.loginBannerButtons}>
+                <TouchableOpacity
+                  style={styles.loginButton}
+                  onPress={() => navigation.navigate("Login")}
+                >
+                  <Text style={styles.loginButtonText}>Đăng nhập</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.registerButton}
+                  onPress={() => navigation.navigate("Register")}
+                >
+                  <Text style={styles.registerButtonText}>Đăng ký</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
-      )}
+        )}
 
-      {/* Featured Categories */}
-      <View style={styles.categoryContainer}>
-        <Text style={styles.filterTitle}>Danh mục nổi bật:</Text>
-        <FlatList
-          data={getUniqueCategories()}
-          horizontal
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => {
-            const categoryProduct = products.find((p) => p.category === item);
-            return (
+        {/* Featured Categories */}
+        <View style={styles.categoryContainer}>
+          <Text style={styles.filterTitle}>Danh mục nổi bật:</Text>
+          <FlatList
+            data={getUniqueCategories()}
+            horizontal
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => {
+              const categoryProduct = products.find((p) => p.category === item);
+              return (
+                <TouchableOpacity
+                  style={styles.categoryItem}
+                  onPress={() =>
+                    setSelectedCategory(selectedCategory === item ? null : item)
+                  }
+                >
+                  {categoryProduct && (
+                    <Image
+                      source={{ uri: categoryProduct.imageUrl }}
+                      style={styles.categoryImage}
+                    />
+                  )}
+                  <Text style={styles.categoryText}>{item}</Text>
+                </TouchableOpacity>
+              );
+            }}
+            showsHorizontalScrollIndicator={false}
+          />
+        </View>
+
+        {/* Category Filter */}
+        <View style={styles.filterContainer}>
+          <Text style={styles.filterTitle}>Danh mục:</Text>
+          <TouchableOpacity
+            style={[
+              styles.filterButton,
+              !selectedCategory && styles.activeFilter,
+            ]}
+            onPress={() => setSelectedCategory(null)}
+          >
+            <Text>Tất cả</Text>
+          </TouchableOpacity>
+          {getUniqueCategories()
+            .slice(0, 3)
+            .map((category) => (
               <TouchableOpacity
-                style={styles.categoryItem}
+                key={category}
+                style={[
+                  styles.filterButton,
+                  selectedCategory === category && styles.activeFilter,
+                ]}
                 onPress={() =>
-                  setSelectedCategory(selectedCategory === item ? null : item)
+                  setSelectedCategory(
+                    selectedCategory === category ? null : category
+                  )
                 }
               >
-                {categoryProduct && (
-                  <Image
-                    source={{ uri: categoryProduct.imageUrl }}
-                    style={styles.categoryImage}
-                  />
-                )}
-                <Text style={styles.categoryText}>{item}</Text>
+                <Text>{category}</Text>
               </TouchableOpacity>
-            );
-          }}
-          showsHorizontalScrollIndicator={false}
+            ))}
+        </View>
+
+        {/* Price Filter */}
+        <View style={styles.filterContainer}>
+          <Text style={styles.filterTitle}>Giá:</Text>
+          <TouchableOpacity
+            style={[styles.filterButton, !priceFilter && styles.activeFilter]}
+            onPress={() => setPriceFilter(null)}
+          >
+            <Text>Tất cả</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.filterButton,
+              priceFilter === "<300" && styles.activeFilter,
+            ]}
+            onPress={() =>
+              setPriceFilter(priceFilter === "<300" ? null : "<300")
+            }
+          >
+            <Text>{"< 300K"}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.filterButton,
+              priceFilter === ">=300" && styles.activeFilter,
+            ]}
+            onPress={() =>
+              setPriceFilter(priceFilter === ">=300" ? null : ">=300")
+            }
+          >
+            <Text>{">= 300K"}</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Products List */}
+        <FlatList
+          data={filteredProducts}
+          keyExtractor={(item) => item.id}
+          numColumns={2}
+          columnWrapperStyle={{ justifyContent: "space-between" }}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          renderItem={({ item }) => (
+            <CardProduct product={convertProduct(item)} />
+          )}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>Không tìm thấy sản phẩm nào</Text>
+            </View>
+          }
         />
       </View>
-
-      {/* Category Filter */}
-      <View style={styles.filterContainer}>
-        <Text style={styles.filterTitle}>Danh mục:</Text>
-        <TouchableOpacity
-          style={[
-            styles.filterButton,
-            !selectedCategory && styles.activeFilter,
-          ]}
-          onPress={() => setSelectedCategory(null)}
-        >
-          <Text>Tất cả</Text>
-        </TouchableOpacity>
-        {getUniqueCategories()
-          .slice(0, 3)
-          .map((category) => (
-            <TouchableOpacity
-              key={category}
-              style={[
-                styles.filterButton,
-                selectedCategory === category && styles.activeFilter,
-              ]}
-              onPress={() =>
-                setSelectedCategory(
-                  selectedCategory === category ? null : category
-                )
-              }
-            >
-              <Text>{category}</Text>
-            </TouchableOpacity>
-          ))}
-      </View>
-
-      {/* Price Filter */}
-      <View style={styles.filterContainer}>
-        <Text style={styles.filterTitle}>Giá:</Text>
-        <TouchableOpacity
-          style={[styles.filterButton, !priceFilter && styles.activeFilter]}
-          onPress={() => setPriceFilter(null)}
-        >
-          <Text>Tất cả</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.filterButton,
-            priceFilter === "<300" && styles.activeFilter,
-          ]}
-          onPress={() => setPriceFilter(priceFilter === "<300" ? null : "<300")}
-        >
-          <Text>{"< 300K"}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.filterButton,
-            priceFilter === ">=300" && styles.activeFilter,
-          ]}
-          onPress={() =>
-            setPriceFilter(priceFilter === ">=300" ? null : ">=300")
-          }
-        >
-          <Text>{">= 300K"}</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Products List */}
-      <FlatList
-        data={filteredProducts}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        columnWrapperStyle={{ justifyContent: "space-between" }}
-        contentContainerStyle={{ paddingBottom: 20 }}
-        renderItem={({ item }) => (
-          <CardProduct product={convertProduct(item)} />
-        )}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>Không tìm thấy sản phẩm nào</Text>
-          </View>
-        }
-      />
-    </View>
+    </SafeAreaView>
   );
 };
 

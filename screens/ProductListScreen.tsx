@@ -18,6 +18,7 @@ import { RootStackParamList } from "../types/navigation";
 import { useProducts, Product } from "../contexts/ProductContext";
 import { useAuth } from "../contexts/AuthContext";
 import { categories } from "../data/categories";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface Category {
   id: string;
@@ -165,252 +166,254 @@ const ProductListScreen = () => {
   const filteredProducts = getFilteredProducts();
 
   return (
-    <View style={styles.container}>
-      {/* Header với thanh tìm kiếm */}
-      <View style={styles.header}>
-        <TextInput
-          style={styles.searchBar}
-          placeholder="Tìm kiếm sản phẩm..."
-          value={searchQuery}
-          onChangeText={handleSearch}
-        />
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => setMenuVisible(true)}
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        {/* Header với thanh tìm kiếm */}
+        <View style={styles.header}>
+          <TextInput
+            style={styles.searchBar}
+            placeholder="Tìm kiếm sản phẩm..."
+            value={searchQuery}
+            onChangeText={handleSearch}
+          />
+          <TouchableOpacity
+            style={styles.menuButton}
+            onPress={() => setMenuVisible(true)}
+          >
+            <Text style={styles.menuButtonText}>Menu</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Modal Menu Điều hướng */}
+        <Modal
+          visible={menuVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setMenuVisible(false)}
         >
-          <Text style={styles.menuButtonText}>Menu</Text>
-        </TouchableOpacity>
-      </View>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Điều hướng ứng dụng</Text>
 
-      {/* Modal Menu Điều hướng */}
-      <Modal
-        visible={menuVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setMenuVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Điều hướng ứng dụng</Text>
+              {/* Menu items for all users */}
+              <TouchableOpacity
+                style={styles.navigationButton}
+                onPress={() => {
+                  navigation.navigate("ProductList");
+                  setMenuVisible(false);
+                }}
+              >
+                <Text style={styles.navigationButtonText}>
+                  Danh sách sản phẩm
+                </Text>
+              </TouchableOpacity>
 
-            {/* Menu items for all users */}
+              <TouchableOpacity
+                style={styles.navigationButton}
+                onPress={() => {
+                  navigation.navigate("Search");
+                  setMenuVisible(false);
+                }}
+              >
+                <Text style={styles.navigationButtonText}>Tìm kiếm</Text>
+              </TouchableOpacity>
+
+              {/* Menu items only for logged in users */}
+              {currentUser && (
+                <>
+                  <TouchableOpacity
+                    style={styles.navigationButton}
+                    onPress={() => {
+                      navigation.navigate("Address");
+                      setMenuVisible(false);
+                    }}
+                  >
+                    <Text style={styles.navigationButtonText}>
+                      Quản lý địa chỉ
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.navigationButton}
+                    onPress={() => {
+                      navigation.navigate("Notification");
+                      setMenuVisible(false);
+                    }}
+                  >
+                    <Text style={styles.navigationButtonText}>Thông báo</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+
+              {/* Admin-only menu items */}
+              {currentUser?.role === "admin" && (
+                <>
+                  <TouchableOpacity
+                    style={styles.navigationButton}
+                    onPress={() => {
+                      navigation.navigate("ProductManagement");
+                      setMenuVisible(false);
+                    }}
+                  >
+                    <Text style={styles.navigationButtonText}>
+                      Quản lý sản phẩm
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.navigationButton}
+                    onPress={() => {
+                      navigation.navigate("OrderManagement");
+                      setMenuVisible(false);
+                    }}
+                  >
+                    <Text style={styles.navigationButtonText}>
+                      Quản lý đơn hàng
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.navigationButton}
+                    onPress={() => {
+                      navigation.navigate("CategoryManagement");
+                      setMenuVisible(false);
+                    }}
+                  >
+                    <Text style={styles.navigationButtonText}>
+                      Quản lý danh mục
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.navigationButton}
+                    onPress={() => {
+                      navigation.navigate("Analytics");
+                      setMenuVisible(false);
+                    }}
+                  >
+                    <Text style={styles.navigationButtonText}>Thống kê</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+
+              <TouchableOpacity
+                style={[styles.navigationButton, styles.closeButton]}
+                onPress={() => setMenuVisible(false)}
+              >
+                <Text style={styles.closeButtonText}>Đóng</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        {/* Danh sách danh mục */}
+        <View style={styles.categoriesSection}>
+          <Text style={styles.sectionTitle}>Danh mục</Text>
+          <FlatList
+            data={categories}
+            renderItem={renderCategoryItem}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoriesList}
+          />
+        </View>
+
+        {/* Bộ lọc */}
+        <View style={styles.filterBar}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <TouchableOpacity
-              style={styles.navigationButton}
-              onPress={() => {
-                navigation.navigate("ProductList");
-                setMenuVisible(false);
-              }}
+              style={[
+                styles.filterButton,
+                sortOption === "newest" && styles.activeFilterButton,
+              ]}
+              onPress={() => handleSort("newest")}
             >
-              <Text style={styles.navigationButtonText}>
-                Danh sách sản phẩm
+              <Text
+                style={[
+                  styles.filterText,
+                  sortOption === "newest" && styles.activeFilterText,
+                ]}
+              >
+                Mới nhất
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.navigationButton}
-              onPress={() => {
-                navigation.navigate("Search");
-                setMenuVisible(false);
-              }}
+              style={[
+                styles.filterButton,
+                sortOption === "rating" && styles.activeFilterButton,
+              ]}
+              onPress={() => handleSort("rating")}
             >
-              <Text style={styles.navigationButtonText}>Tìm kiếm</Text>
+              <Text
+                style={[
+                  styles.filterText,
+                  sortOption === "rating" && styles.activeFilterText,
+                ]}
+              >
+                Đánh giá cao
+              </Text>
             </TouchableOpacity>
-
-            {/* Menu items only for logged in users */}
-            {currentUser && (
-              <>
-                <TouchableOpacity
-                  style={styles.navigationButton}
-                  onPress={() => {
-                    navigation.navigate("Address");
-                    setMenuVisible(false);
-                  }}
-                >
-                  <Text style={styles.navigationButtonText}>
-                    Quản lý địa chỉ
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.navigationButton}
-                  onPress={() => {
-                    navigation.navigate("Notification");
-                    setMenuVisible(false);
-                  }}
-                >
-                  <Text style={styles.navigationButtonText}>Thông báo</Text>
-                </TouchableOpacity>
-              </>
-            )}
-
-            {/* Admin-only menu items */}
-            {currentUser?.role === "admin" && (
-              <>
-                <TouchableOpacity
-                  style={styles.navigationButton}
-                  onPress={() => {
-                    navigation.navigate("ProductManagement");
-                    setMenuVisible(false);
-                  }}
-                >
-                  <Text style={styles.navigationButtonText}>
-                    Quản lý sản phẩm
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.navigationButton}
-                  onPress={() => {
-                    navigation.navigate("OrderManagement");
-                    setMenuVisible(false);
-                  }}
-                >
-                  <Text style={styles.navigationButtonText}>
-                    Quản lý đơn hàng
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.navigationButton}
-                  onPress={() => {
-                    navigation.navigate("CategoryManagement");
-                    setMenuVisible(false);
-                  }}
-                >
-                  <Text style={styles.navigationButtonText}>
-                    Quản lý danh mục
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.navigationButton}
-                  onPress={() => {
-                    navigation.navigate("Analytics");
-                    setMenuVisible(false);
-                  }}
-                >
-                  <Text style={styles.navigationButtonText}>Thống kê</Text>
-                </TouchableOpacity>
-              </>
-            )}
 
             <TouchableOpacity
-              style={[styles.navigationButton, styles.closeButton]}
-              onPress={() => setMenuVisible(false)}
+              style={[
+                styles.filterButton,
+                sortOption === "price-asc" && styles.activeFilterButton,
+              ]}
+              onPress={() => handleSort("price-asc")}
             >
-              <Text style={styles.closeButtonText}>Đóng</Text>
+              <Text
+                style={[
+                  styles.filterText,
+                  sortOption === "price-asc" && styles.activeFilterText,
+                ]}
+              >
+                Giá thấp → cao
+              </Text>
             </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.filterButton,
+                sortOption === "price-desc" && styles.activeFilterButton,
+              ]}
+              onPress={() => handleSort("price-desc")}
+            >
+              <Text
+                style={[
+                  styles.filterText,
+                  sortOption === "price-desc" && styles.activeFilterText,
+                ]}
+              >
+                Giá cao → thấp
+              </Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+
+        {/* Danh sách sản phẩm */}
+        <View style={styles.productListContainer}>
+          <View style={styles.productListHeader}>
+            <Text style={styles.sectionTitle}>
+              {selectedCategory ? selectedCategory : "Tất cả sản phẩm"}
+            </Text>
+            <Text style={styles.resultCount}>
+              {filteredProducts.length} kết quả
+            </Text>
           </View>
+
+          <FlatList
+            data={filteredProducts}
+            renderItem={renderProductItem}
+            keyExtractor={(item) => item.id}
+            numColumns={2}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.productList}
+          />
         </View>
-      </Modal>
-
-      {/* Danh sách danh mục */}
-      <View style={styles.categoriesSection}>
-        <Text style={styles.sectionTitle}>Danh mục</Text>
-        <FlatList
-          data={categories}
-          renderItem={renderCategoryItem}
-          keyExtractor={(item) => item.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoriesList}
-        />
       </View>
-
-      {/* Bộ lọc */}
-      <View style={styles.filterBar}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <TouchableOpacity
-            style={[
-              styles.filterButton,
-              sortOption === "newest" && styles.activeFilterButton,
-            ]}
-            onPress={() => handleSort("newest")}
-          >
-            <Text
-              style={[
-                styles.filterText,
-                sortOption === "newest" && styles.activeFilterText,
-              ]}
-            >
-              Mới nhất
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.filterButton,
-              sortOption === "rating" && styles.activeFilterButton,
-            ]}
-            onPress={() => handleSort("rating")}
-          >
-            <Text
-              style={[
-                styles.filterText,
-                sortOption === "rating" && styles.activeFilterText,
-              ]}
-            >
-              Đánh giá cao
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.filterButton,
-              sortOption === "price-asc" && styles.activeFilterButton,
-            ]}
-            onPress={() => handleSort("price-asc")}
-          >
-            <Text
-              style={[
-                styles.filterText,
-                sortOption === "price-asc" && styles.activeFilterText,
-              ]}
-            >
-              Giá thấp → cao
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.filterButton,
-              sortOption === "price-desc" && styles.activeFilterButton,
-            ]}
-            onPress={() => handleSort("price-desc")}
-          >
-            <Text
-              style={[
-                styles.filterText,
-                sortOption === "price-desc" && styles.activeFilterText,
-              ]}
-            >
-              Giá cao → thấp
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </View>
-
-      {/* Danh sách sản phẩm */}
-      <View style={styles.productListContainer}>
-        <View style={styles.productListHeader}>
-          <Text style={styles.sectionTitle}>
-            {selectedCategory ? selectedCategory : "Tất cả sản phẩm"}
-          </Text>
-          <Text style={styles.resultCount}>
-            {filteredProducts.length} kết quả
-          </Text>
-        </View>
-
-        <FlatList
-          data={filteredProducts}
-          renderItem={renderProductItem}
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.productList}
-        />
-      </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
