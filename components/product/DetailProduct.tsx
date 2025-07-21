@@ -7,9 +7,11 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { useCart } from "../../contexts/CartContext";
 import { Product } from "../../contexts/ProductContext";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../types/navigation";
 
 type ProductDetailRouteProp = RouteProp<
   { ProductDetail: { product: Product } },
@@ -17,6 +19,8 @@ type ProductDetailRouteProp = RouteProp<
 >;
 
 const DetailProduct: React.FC<{ product: Product }> = ({ product }) => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { params } = useRoute<ProductDetailRouteProp>();
   const { addToCart } = useCart();
 
@@ -39,7 +43,10 @@ const DetailProduct: React.FC<{ product: Product }> = ({ product }) => {
 
         <TouchableOpacity
           style={styles.buyNowButton}
-          onPress={() => alert("Chức năng mua ngay chưa triển khai")}
+          onPress={() => {
+            addToCart(product);
+            navigation.navigate("Tab", { screen: "Cart" });
+          }}
         >
           <Text style={styles.buyNowText}>Mua Ngay</Text>
         </TouchableOpacity>

@@ -67,7 +67,7 @@ export type RootStackParamList = {
 
 export type BottomTabParamList = {
   Home: undefined;
-  Cart: { selectedCoupon?: string };
+  Cart: { selectedCoupon: string };
   Profile: undefined;
   Chat: undefined;
 
