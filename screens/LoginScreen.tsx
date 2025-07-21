@@ -1,36 +1,195 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useAuth } from '../contexts/AuthContext';
+import { RootStackParamList } from '../types/navigation';
+import { CommonActions } from '@react-navigation/native';
 
-type Props = NativeStackScreenProps<any>;
+type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 export default function Login({ navigation }: Props) {
-  const { login } = useAuth();
-  const [email, setEmail] = useState('');
+  const { login, currentUser } = useAuth();
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  useEffect(() => {
+    // If user is already logged in, redirect to the appropriate screen
+    if (currentUser) {
+      try {
+        if (currentUser.role === 'admin') {
+          // Sử dụng navigate thay vì dispatch để tránh lỗi
+          navigation.navigate('AdminTab');
+        } else {
+          navigation.navigate('Tab');
+        }
+      } catch (error) {
+        console.error("Navigation error:", error);
+      }
+    }
+  }, [currentUser, navigation]);
 
   const handleLogin = () => {
-    const success = login(email, password);
-    if (!success) setError('Invalid credentials');
+    setError('');
+    console.log('Attempting login with:', username, password);
+    const success = login(username, password);
+    console.log('Login result:', success);
+    
+    if (!success) {
+      setError('Invalid username or password');
+    }
+    // The useEffect will handle navigation when currentUser changes
   };
 
   return (
     <View style={styles.container}>
-      <Text>Email:</Text>
-      <TextInput value={email} onChangeText={setEmail} style={styles.input} />
-      <Text>Password:</Text>
-      <TextInput value={password} onChangeText={setPassword} secureTextEntry style={styles.input} />
+      <View style={styles.logoContainer}>
+        <Image 
+          source={require('../assets/logo.png')} 
+          style={styles.logo} 
+          resizeMode="contain"
+        />
+      </View>
+      
+      <Text style={styles.title}>Login</Text>
+      
+      <Text style={styles.label}>Username:</Text>
+      <TextInput 
+        value={username} 
+        onChangeText={setUsername} 
+        style={styles.input} 
+        placeholder="Enter your username"
+        autoCapitalize="none"
+      />
+      
+      <Text style={styles.label}>Password:</Text>
+      <TextInput 
+        value={password} 
+        onChangeText={setPassword} 
+        secureTextEntry 
+        style={styles.input} 
+        placeholder="Enter your password"
+      />
+      
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      <Button title="Login" onPress={handleLogin} />
-      <Button title="Register" onPress={() => navigation.navigate('Register')} />
+      
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>Login</Text>
+      </TouchableOpacity>
+      
+      {/* Test buttons */}
+      <View style={styles.testContainer}>
+        <Text style={styles.testTitle}>Quick Test:</Text>
+        <TouchableOpacity 
+          style={[styles.button, { backgroundColor: '#28a745' }]} 
+          onPress={() => {
+            setUsername('admin');
+            setPassword('123');
+          }}
+        >
+          <Text style={styles.buttonText}>Fill Admin Credentials</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={[styles.button, { backgroundColor: '#007bff' }]} 
+          onPress={() => {
+            setUsername('user@test.com');
+            setPassword('user123');
+          }}
+        >
+          <Text style={styles.buttonText}>Fill User Credentials</Text>
+        </TouchableOpacity>
+      </View>
+      
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>Don't have an account?</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+          <Text style={styles.link}>Register</Text>
+        </TouchableOpacity>
+      </View>
+      
+      <View style={styles.hint}>
+        <Text style={styles.hintText}>Admin: admin / 123</Text>
+        <Text style={styles.hintText}>User: user@test.com / user123</Text>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20 },
-  input: { borderWidth: 1, padding: 8, marginVertical: 5 },
-  error: { color: 'red' }
+  container: { 
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff'
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginVertical: 30
+  },
+  logo: {
+    width: 150,
+    height: 150
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center'
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 5
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 5,
+    padding: 12,
+    marginBottom: 15,
+    backgroundColor: '#f9f9f9'
+  },
+  button: {
+    backgroundColor: '#007bff',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold'
+  },
+  error: {
+    color: 'red',
+    marginBottom: 10
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20
+  },
+  footerText: {
+    marginRight: 5
+  },
+  link: {
+    color: '#007bff',
+    fontWeight: 'bold'
+  },
+  hint: {
+    marginTop: 40,
+    alignItems: 'center'
+  },
+  hintText: {
+    color: '#888',
+    fontSize: 12
+  },
+  testContainer: {
+    marginVertical: 20,
+    alignItems: 'center'
+  },
+  testTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10
+  }
 });

@@ -1,5 +1,9 @@
+import { Product } from '../contexts/ProductContext';
+
 export type RootStackParamList = {
   Tab: { screen: keyof BottomTabParamList } | undefined;
+  GuestTab: undefined;
+  AdminTab: undefined;
   Profile: undefined;
   Wishlist: undefined;
   OrderHistory: undefined;
@@ -9,7 +13,11 @@ export type RootStackParamList = {
 
   OrderDetail: undefined;
 
-  Review: undefined;
+  Review: {
+    orderId?: string;
+    productId?: string;
+    productName?: string;
+  };
 
   Payment: { totalAmount: number };
 
@@ -17,7 +25,7 @@ export type RootStackParamList = {
   HelpCenter: undefined;
   Tabs: undefined;
 
-  ProductDetail: undefined;
+  ProductDetail: { product: Product };
   Checkout: undefined;
   Login: undefined;
   Register: undefined;
@@ -33,7 +41,31 @@ export type RootStackParamList = {
   Policy: undefined;
   AccountSecurity: undefined;
   MyProfile: undefined;
+  // Thêm các màn hình cài đặt mới:
+  BankAccount: undefined;
+  ChatSettings: undefined;
+  NotificationSettings: undefined;
+  PrivacySettings: undefined;
+  BlockedUsers: undefined;
+  Language: undefined;
+  CommunityStandards: undefined;
+  About: undefined;
+
+  // Help Center Screens
+  OrderHelp: undefined;
+  ShippingHelp: undefined;
+  PaymentHelp: undefined;
+  RefundHelp: undefined;
+  ContactHelp: undefined;
+
+  // Account & Security Screens
+  ChangePassword: undefined;
+  SocialAccounts: undefined;
+  UsernameSettings: undefined;
+  PhoneSettings: undefined;
+  EmailSettings: undefined;
 };
+
 export type BottomTabParamList = {
   Home: undefined;
   Cart: { selectedCoupon?: string };
@@ -42,6 +74,14 @@ export type BottomTabParamList = {
 
   CreateReview: undefined;
   Coupons: undefined;
+};
+
+export type AdminTabParamList = {
+  ProductManagement: undefined;
+  OrderManagement: undefined;
+  Analytics: undefined;
+  CategoryManagement: undefined;
+  UserManager: undefined;
 };
 
 // Thêm các màn hình khác nếu có

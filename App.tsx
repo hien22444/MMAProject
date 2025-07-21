@@ -1,17 +1,23 @@
+
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
-import MainNavigator from "./navigation/MainNavigator";
-import ProfileScreen from "./screens/ProfileScreen";
+import RootNavigator from "./navigation/RootNavigator";
 
 import { CartProvider } from "./contexts/CartContext";
 import { AuthProvider } from "./contexts/AuthContext";
+import { ProductProvider } from "./contexts/ProductContext";
+import { OrderProvider } from "./contexts/OrderContext";
 
 export default function App() {
   return (
     <AuthProvider>
-      <CartProvider>
-        <MainNavigator />
-      </CartProvider>
+      <ProductProvider>
+        <OrderProvider>
+          <CartProvider>
+            <RootNavigator />
+          </CartProvider>
+        </OrderProvider>
+      </ProductProvider>
       <StatusBar style="auto" />
     </AuthProvider>
   );

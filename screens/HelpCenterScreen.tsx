@@ -1,20 +1,25 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/navigation';
 
 const helpTopics = [
-  { id: '1', title: 'Về đơn hàng', icon: 'receipt-outline' },
-  { id: '2', title: 'Vận chuyển & giao hàng', icon: 'car-outline' },
-  { id: '3', title: 'Thanh toán', icon: 'card-outline' },
-  { id: '4', title: 'Hoàn trả & hoàn tiền', icon: 'refresh-outline' },
-  { id: '5', title: 'Tài khoản & bảo mật', icon: 'person-outline' },
-  { id: '6', title: 'Liên hệ hỗ trợ', icon: 'call-outline' },
+  { id: '1', title: 'Về đơn hàng', icon: 'receipt-outline', screen: 'OrderHelp' },
+  { id: '2', title: 'Vận chuyển & giao hàng', icon: 'car-outline', screen: 'ShippingHelp' },
+  { id: '3', title: 'Thanh toán', icon: 'card-outline', screen: 'PaymentHelp' },
+  { id: '4', title: 'Hoàn trả & hoàn tiền', icon: 'refresh-outline', screen: 'RefundHelp' },
+  { id: '5', title: 'Liên hệ hỗ trợ', icon: 'call-outline', screen: 'ContactHelp' },
 ];
 
+type HelpCenterNavigationProp = NativeStackNavigationProp<RootStackParamList, 'HelpCenter'>;
+
 export default function HelpCenterScreen() {
-  const handleTopicPress = (topic: string) => {
-    // TODO: Chuyển sang màn hình chi tiết nếu cần
-    console.log('Đã chọn:', topic);
+  const navigation = useNavigation<HelpCenterNavigationProp>();
+
+  const handleTopicPress = (screen: string) => {
+    navigation.navigate(screen as any);
   };
 
   return (
@@ -25,7 +30,7 @@ export default function HelpCenterScreen() {
           <TouchableOpacity
             key={item.id}
             style={styles.item}
-            onPress={() => handleTopicPress(item.title)}
+            onPress={() => handleTopicPress(item.screen)}
           >
             <Ionicons name={item.icon as any} size={22} color="#007bff" style={styles.icon} />
             <Text style={styles.label}>{item.title}</Text>

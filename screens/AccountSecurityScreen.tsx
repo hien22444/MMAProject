@@ -35,7 +35,16 @@ const AccountSecurityScreen = () => {
     const handlePress = (label: string) => {
         if (label === 'Hồ sơ của tôi') {
             navigation.navigate('MyProfile');
-
+        } else if (label === 'Tên người dùng') {
+            navigation.navigate('UsernameSettings');
+        } else if (label === 'Điện thoại') {
+            navigation.navigate('PhoneSettings');
+        } else if (label === 'Email nhận hóa đơn') {
+            navigation.navigate('EmailSettings');
+        } else if (label === 'Tài khoản mạng xã hội') {
+            navigation.navigate('SocialAccounts');
+        } else if (label === 'Đổi mật khẩu') {
+            navigation.navigate('ChangePassword');
         } else {
             // Với các mục khác, bạn có thể dùng Alert hoặc để trống
             console.log(`Đã chọn: ${label}`);
@@ -47,9 +56,9 @@ const AccountSecurityScreen = () => {
             <Text style={styles.header}>Tài Khoản</Text>
 
             <InfoItem label="Hồ sơ của tôi" onPress={() => handlePress('Hồ sơ của tôi')} />
-            <InfoItem label="Tên người dùng" value="7dxofpzngl" />
-            <InfoItem label="Điện thoại" value="*****95" />
-            <InfoItem label="Email nhận hóa đơn" value="h*********3@gmail.com" />
+            <InfoItem label="Tên người dùng" value="anhbakhia" onPress={() => handlePress('Tên người dùng')} />
+            <InfoItem label="Điện thoại" value="*****95" onPress={() => handlePress('Điện thoại')} />
+            <InfoItem label="Email nhận hóa đơn" value="h*********3@gmail.com" onPress={() => handlePress('Email nhận hóa đơn')} />
             <InfoItem label="Tài khoản mạng xã hội" onPress={() => handlePress('Tài khoản mạng xã hội')} />
             <InfoItem label="Đổi mật khẩu" onPress={() => handlePress('Đổi mật khẩu')} />
         </ScrollView>

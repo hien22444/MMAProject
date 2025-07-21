@@ -143,6 +143,22 @@ export default function AccountSettings() {
   const handlePress = (label: string) => {
     if (label === 'Tài khoản & Bảo mật') {
       navigation.navigate('AccountSecurity');
+    } else if (label === 'Tài khoản / Thẻ ngân hàng') {
+      navigation.navigate('BankAccount');
+    } else if (label === 'Cài đặt Chat') {
+      navigation.navigate('ChatSettings');
+    } else if (label === 'Cài đặt Thông báo') {
+      navigation.navigate('NotificationSettings');
+    } else if (label === 'Cài đặt riêng tư') {
+      navigation.navigate('PrivacySettings');
+    } else if (label === 'Người dùng đã bị chặn') {
+      navigation.navigate('BlockedUsers');
+    } else if (label === 'Ngôn ngữ / Language') {
+      navigation.navigate('Language');
+    } else if (label === 'Tiêu chuẩn cộng đồng') {
+      navigation.navigate('CommunityStandards');
+    } else if (label === 'Giới thiệu') {
+      navigation.navigate('About');
     } else {
       Alert.alert('Tính năng', `Bạn đã chọn: ${label}`);
     }

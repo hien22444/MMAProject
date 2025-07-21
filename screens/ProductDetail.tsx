@@ -105,7 +105,10 @@ const ProductDetail: React.FC = () => {
           }}
           android_ripple={{ color: "#FF6F61" }}
           onPress={() => {
-            navigation.navigate("Review");
+            navigation.navigate("Review", {
+              productId: "sample-product",
+              productName: "Sản phẩm mẫu"
+            });
           }}
         >
           <Text style={{ color: "#FF6F61" }}>Xem thêm đánh giá &gt;&gt;</Text>

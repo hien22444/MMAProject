@@ -35,6 +35,11 @@ const CartScreen: React.FC = () => {
   const route = useRoute<CartScreenRouteProp>();
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
+  // Auto-select all items when cartItems change
+  useEffect(() => {
+    setSelectedItems(cartItems.map(item => item.id));
+  }, [cartItems]);
+
   useEffect(() => {
     if (route.params?.selectedCoupon) {
       setCoupon(route.params.selectedCoupon);
@@ -51,12 +56,13 @@ const CartScreen: React.FC = () => {
   const calculateSubtotal = () => {
     return cartItems.reduce((total, item) => {
       if (!selectedItems.includes(item.id)) return total;
-      const priceNumber = parseInt(item.price.replace(/\D/g, ""));
-      return total + priceNumber * item.quantity;
+      return total + item.price * item.quantity;
     }, 0);
   };
 
   const subtotal = calculateSubtotal();
+  const discount = coupon === 'SALE10' && subtotal >= 500000 ? subtotal * 0.1 : coupon === 'FREESHIP' ? 30000 : 0;
+  const total = subtotal - discount;
 
   const handleCheckout = () => {
     if (selectedItems.length === 0) {
@@ -83,14 +89,16 @@ const CartScreen: React.FC = () => {
                 value={selectedItems.includes(item.id)}
                 onValueChange={() => toggleSelectItem(item.id)}
               />
-              <Image source={item.image} style={styles.image} />
+              <Image source={{ uri: item.imageUrl }} style={styles.image} />
               <View style={styles.infoContainer}>
                 <Text style={styles.name}>{item.name}</Text>
                 <Text style={styles.variant}>
-                  Phân loại: Nâu kéo chậm - 35cm
+                  Danh mục: {item.category}
                 </Text>
                 <View style={styles.priceContainer}>
-                  <Text style={styles.discountedPrice}>{item.price}</Text>
+                  <Text style={styles.discountedPrice}>
+                    {item.price.toLocaleString('vi-VN')}₫
+                  </Text>
                 </View>
                 <View style={styles.quantityContainer}>
                   <TouchableOpacity
@@ -110,10 +118,7 @@ const CartScreen: React.FC = () => {
               </View>
               <View style={styles.rightContainer}>
                 <Text style={styles.totalItemPrice}>
-                  {(
-                    parseInt(item.price.replace(/\D/g, "")) * item.quantity
-                  ).toLocaleString()}
-                  ₫
+                  {(item.price * item.quantity).toLocaleString('vi-VN')}₫
                 </Text>
                 <TouchableOpacity onPress={() => removeFromCart(item.id)}>
                   <Text style={styles.deleteText}>Xóa</Text>
@@ -148,10 +153,7 @@ const CartScreen: React.FC = () => {
         >
           <Text style={styles.checkoutButtonText}>Nhập Mã Giảm Giá</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.checkoutButton}
-          onPress={handleCheckout}
-        >
+        <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
           <Text style={styles.checkoutButtonText}>Thanh Toán</Text>
         </TouchableOpacity>
       </View>

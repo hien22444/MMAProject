@@ -17,7 +17,8 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const defaultUsers: User[] = [
-  { email: 'admin@test.com', password: 'admin123', role: 'admin' }
+  { email: 'admin', password: '123', role: 'admin' },
+  { email: 'user@test.com', password: 'user123', role: 'user' }
 ];
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -25,11 +26,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   const login = (email: string, password: string): boolean => {
+    console.log('AuthContext login attempt:', email, password);
+    console.log('Available users:', registeredUsers);
     const user = registeredUsers.find(u => u.email === email && u.password === password);
+    console.log('Found user:', user);
     if (user) {
       setCurrentUser(user);
+      console.log('Login successful, user role:', user.role);
       return true;
     }
+    console.log('Login failed');
     return false;
   };
 
