@@ -16,11 +16,14 @@ const AllReviewScreen: React.FC<AllReviewRouteProp> = ({
   route,
   navigation,
 }) => {
-  const renderReview = ({ item }: any) => <ReviewBox {...item} />;
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const { reviews } = useReviews();
   const { productId } = route.params || {};
   const { currentUser } = useAuth();
+
+  const renderReview = ({ item }: any) => (
+    <ReviewBox {...item} userId={item.userId} reviewId={item.id} />
+  );
 
   return (
     <>
@@ -42,7 +45,7 @@ const AllReviewScreen: React.FC<AllReviewRouteProp> = ({
         <View>
           <FlatList
             data={reviews.filter((r) => r.productId === productId).reverse()}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item) => item.id}
             renderItem={renderReview}
           />
         </View>

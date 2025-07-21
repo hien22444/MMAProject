@@ -1,8 +1,27 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, Pressable, Alert } from "react-native";
 import Entypo from "@expo/vector-icons/Entypo";
-import React from "react";
+import React, { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../types/navigation";
+import { useNavigation } from "@react-navigation/native";
+import { useReviews } from "../../contexts/ReviewContext";
 
-export default function UserInfo({ avatar, fullname, email, createdAt }: any) {
+export default function UserInfo({
+  reviewId,
+  userId,
+  avatar,
+  fullname,
+  email,
+  createdAt,
+}: any) {
+  const { currentUser } = useAuth();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const [showMenu, setShowMenu] = useState(false);
+
+  const { deleteReview } = useReviews();
+
   return (
     <View style={styles.container}>
       <View style={styles.left}>
@@ -17,12 +36,79 @@ export default function UserInfo({ avatar, fullname, email, createdAt }: any) {
           />
         </View>
         <View style={styles.info}>
-          <Text style={styles.text}>{fullname}</Text>
+          <Text style={styles.text}>{fullname || email || "Anonymous"}</Text>
           <Text style={[styles.text, styles.textDate]}>{createdAt}</Text>
         </View>
       </View>
-      <View style={styles.right}>
-        <Entypo name="dots-three-horizontal" size={18} color="#333" />
+      <View style={styles.actionBox}>
+        <Pressable
+          onPress={() => {
+            if (!currentUser) return navigation.navigate("Login");
+            setShowMenu(!showMenu);
+          }}
+        >
+          <View>
+            <Entypo name="dots-three-horizontal" size={18} color="#333" />
+          </View>
+        </Pressable>
+
+        {showMenu && (
+          <View style={styles.menu}>
+            {/* <Pressable
+              style={({ pressed }) => [
+                styles.menuItem,
+                pressed && { backgroundColor: "#ddd" },
+              ]}
+              onPress={() => {
+                if (!currentUser) return navigation.navigate("Login");
+                if (currentUser.id !== userId) {
+                  alert("You can only edit your own review");
+                  setShowMenu(false);
+                  return;
+                }
+                alert("Edit review");
+              }}
+            >
+              <Text style={styles.menuText}>Chỉnh sửa</Text>
+            </Pressable> */}
+            <Pressable
+              style={({ pressed }) => [
+                styles.menuItem,
+                pressed && { backgroundColor: "#ddd" },
+              ]}
+              onPress={() => {
+                if (!currentUser) return navigation.navigate("Login");
+                if (currentUser.id !== userId) {
+                  alert("You can only delete your own review");
+                  setShowMenu(false);
+                  return;
+                }
+
+                Alert.alert(
+                  "Xác nhận xóa",
+                  "Bạn có chắc chắn muốn xóa bình luận này?",
+                  [
+                    {
+                      text: "Hủy",
+                      style: "cancel",
+                      onPress: () => setShowMenu(false),
+                    },
+                    {
+                      text: "Xóa",
+                      onPress: () => {
+                        deleteReview(reviewId);
+                        setShowMenu(false);
+                      },
+                      style: "destructive",
+                    },
+                  ]
+                );
+              }}
+            >
+              <Text style={styles.menuText}>Xoá</Text>
+            </Pressable>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -43,7 +129,35 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
   },
-  right: {},
+  actionBox: {
+    position: "relative",
+  },
+
+  menu: {
+    width: 90,
+    position: "absolute",
+    top: 25,
+    right: 0,
+    backgroundColor: "#fff",
+    padding: 6,
+    borderRadius: 5,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    zIndex: 1,
+  },
+  menuItem: {
+    padding: 5,
+  },
+  menuText: {
+    fontSize: 12,
+    color: "#333",
+  },
   avatarContainer: {
     width: 50,
     height: 50,

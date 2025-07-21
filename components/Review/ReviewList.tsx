@@ -26,6 +26,8 @@ const ReviewList: React.FC<ReviewListProps> = ({ reviews, productId }) => {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <ReviewBox
+              reviewId={item.id}
+              userId={item.userId}
               avatar={item.avatar}
               fullname={item.fullname}
               email={item.email}

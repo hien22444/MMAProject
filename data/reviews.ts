@@ -4,7 +4,7 @@ export const reviews: Review[] = [
   {
     id: "1",
     productId: "1",
-    userId: "1",
+    userId: "3",
     avatar: "",
     fullname: "Nguyễn Sỹ Đức",
     email: "duc@gmail.com",
@@ -16,7 +16,7 @@ export const reviews: Review[] = [
   {
     id: "2",
     productId: "1",
-    userId: "1",
+    userId: "4",
     avatar: "",
     fullname: "Trần Văn An",
     email: "an@gmail.com",
@@ -28,7 +28,7 @@ export const reviews: Review[] = [
   {
     id: "3",
     productId: "1",
-    userId: "1",
+    userId: "5",
     avatar: "",
     fullname: "Lưu Vũ Ninh",
     email: "ninh@gmail.com",
@@ -41,7 +41,7 @@ export const reviews: Review[] = [
   {
     id: "4",
     productId: "1",
-    userId: "1",
+    userId: "6",
     avatar: "",
     fullname: "Trần Gia Hân",
     email: "han@gmail.com",
@@ -51,9 +51,9 @@ export const reviews: Review[] = [
     content: "Sản phẩm nhìn ngoài không được như mong đợi. Giao hơi chậm.",
   },
   {
-    id: "5",
+    id: "0",
     productId: "1",
-    userId: "1",
+    userId: "7",
     avatar: "",
     fullname: "Ngô Bá Khải",
     email: "khai@gmail.com",

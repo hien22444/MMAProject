@@ -4,6 +4,8 @@ import UserInfo from "./UserInfo";
 import ReviewContent from "./ReviewContent";
 
 export default function ReviewBox({
+  reviewId,
+  userId,
   avatar,
   fullname,
   email,
@@ -15,6 +17,8 @@ export default function ReviewBox({
   return (
     <View style={styles.container}>
       <UserInfo
+        reviewId={reviewId}
+        userId={userId}
         avatar={null}
         fullname={fullname}
         email={email}

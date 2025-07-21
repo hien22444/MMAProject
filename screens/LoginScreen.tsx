@@ -89,7 +89,7 @@ export default function Login({ navigation }: Props) {
         <TouchableOpacity
           style={[styles.button, { backgroundColor: "#28a745" }]}
           onPress={() => {
-            setUsername("admin");
+            setUsername("admin@test.com");
             setPassword("123");
           }}
         >
