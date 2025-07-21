@@ -79,13 +79,12 @@ export default function RootNavigator() {
               component={ProductListScreen}
               options={{ title: "Danh sách sản phẩm" }}
             />
-            {currentUser && (
-              <Stack.Screen
-                name="ProductDetail"
-                component={ProductDetail}
-                options={{ title: "Chi tiết" }}
-              />
-            )}
+
+            {/* <Stack.Screen
+              name="ProductDetail"
+              component={ProductDetail}
+              options={{ title: "Chi tiết" }}
+            /> */}
 
             <Stack.Screen
               name="AllReviews"

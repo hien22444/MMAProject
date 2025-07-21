@@ -21,6 +21,13 @@ export default function ProfileScreen() {
   const { currentUser, logout } = useAuth();
   const handleLogout = () => {
     logout();
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+
+        routes: [{ name: "Home" }],
+      })
+    );
   };
 
   const handlePress = (label: string) => {
